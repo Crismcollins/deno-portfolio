@@ -26,3 +26,4 @@ export function  GetLinkAuthorizeApp() {
   const link = oauth2Client.buildAuthLink();
   return link;
 }
+

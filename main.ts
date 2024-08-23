@@ -1,4 +1,8 @@
 import { Hono } from "https://deno.land/x/hono@v3.4.1/mod.ts";
+// import { renderFileToString } from "https://deno.land/x/dejs@0.9.3/mod.ts";
+import { getAccessToken, getProfileInfo } from "./login_google.ts";
+// import { serve } from "https://deno.land/std@0.90.0/http/server.ts";
+
 // import { readData } from "./helpers.ts";
 // import { DOMParser } from 'https://deno.land/x/deno_dom/deno-dom-wasm.ts';
 // import { assert } from "jsr:@std/assert@1";
@@ -13,6 +17,20 @@ const link = GetLinkAuthorizeApp();
 const app = new Hono();
 // app.get("/", (c) => c.redirect("/link"));
 
+app.get("/", async (c) => {
+  const code = c.req.query('code');
+
+  if (code)
+    try {
+      const access_token = await getAccessToken(code);
+    	const profile_info = await getProfileInfo(access_token);
+      return c.json({ code, profile_info, access_token })
+    } catch (e) {
+      return c.json({ error: e })
+    }
+  else
+  return c.json({ code })
+})
 app.get("/link", (c) => {
   return c.json({link});
 });
