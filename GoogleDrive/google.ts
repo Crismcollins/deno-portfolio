@@ -7,6 +7,7 @@ export function connectGoogleOAuth() {
     redirect_uri: Deno.env.get("REDIRECT_URI") ?? '',
     "scopes": ["https://www.googleapis.com/auth/drive"],
   });
+  
   return oauth2Client;
 }
 

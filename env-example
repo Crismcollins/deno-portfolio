@@ -1,3 +1,5 @@
 CLIENT_ID="CLIENT_ID.apps.googleusercontent.com"
 CLIENT_SECRET="CLIENT_SECRET"
 REDIRECT_URI="http://localhost:8000/token-refresh"
+STORAGE_ID="ID_FOLDER_YOU_WANT_TO_BE_A_STORAGE"
+GOOGLE_DRIVE_URL="https://www.googleapis.com/drive/v3"
