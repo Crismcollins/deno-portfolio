@@ -7,9 +7,9 @@ import {
 
 const app = new Hono();
 
-// app.get("/", (c) => c.redirect("/token-refresh"));
-
-GoogleDriveRoutes(app);
+app.get("/", (c) => c.redirect("/token-refresh"));
 TokenRoutes(app);
+GoogleDriveRoutes(app);
+FilesRoutes(app);
 
 Deno.serve(app.fetch);

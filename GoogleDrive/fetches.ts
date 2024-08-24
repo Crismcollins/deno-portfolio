@@ -1,13 +1,15 @@
 import { getGoogleDriveToken } from "../GlobalStates/tokenState.ts";
 import { GoogleDriveFile, GoogleDriveMimeType } from "./types.ts"
 
-export const fetchGoogleDriveData = async (url: string) => {
+type ResponseTypes = 'json' | 'text' | 'binary';
+
+export const fetchGoogleDriveData = async (url: string, responseType: ResponseTypes = 'json') => {
 
   const googleDriveToken = getGoogleDriveToken();
 
   const BASE_URL = Deno.env.get("GOOGLE_DRIVE_URL");
   const finalUrl = `${BASE_URL}${url}`;
-  
+
   const response = await fetch(finalUrl, {
     method: "GET",
     headers: {
@@ -15,7 +17,11 @@ export const fetchGoogleDriveData = async (url: string) => {
     },
   });
   
-  const data = await response.json();
+  const data = responseType === 'text' ? 
+                response.text() :
+                  responseType === 'binary' ?
+                   response.arrayBuffer() :
+                    await response.json();
   return data;
 }
 
@@ -42,4 +48,14 @@ export const getFileById = async(id: string) => {
   const linkDataUrl = `/files/${id}`;
   const linkData = await fetchGoogleDriveData(linkDataUrl);
   return linkData;
+}
+
+export const getFileContentById = async(id: string) : Promise<string | null>=> {
+  const data = await fetchGoogleDriveData(`/files/${id}?alt=media`, 'text')
+  
+  if (!data) {
+    throw new Error(`Error fetching file content:`);
+  }
+
+  return data;
 }
