@@ -4,6 +4,7 @@ import renderPersonalData from "./personalData/personalData.ts";
 const getResumeHTML = async (language: 'en' | 'es') => {
   const globalCss = await Deno.readTextFile("CV/index.css");
   const spacingsCss = await Deno.readTextFile("CV/spacings.css");
+  const token = getResumeHTML();
   
   return `
     <html lang="${language}">
@@ -15,6 +16,7 @@ const getResumeHTML = async (language: 'en' | 'es') => {
       </style>
     </head>
     <body>
+    token: ${token}
     ${createHeader()}
     ${renderPersonalData()}
     </body>
