@@ -2,7 +2,7 @@ import { Hono } from "https://deno.land/x/hono@v3.4.1/mod.ts";
 
 let globalState = {
   googleDriveToken: "",
-  appHono: new Hono(),
+  appHono: null as Hono | null,
 };
 
 export function setGoogleDriveToken(token: string) {
@@ -13,8 +13,8 @@ export function getGoogleDriveToken() {
   return globalState.googleDriveToken;
 }
 
-export function setAppHono() {
-  globalState.appHono = new Hono();
+export function setAppHono(app: Hono) {
+  globalState.appHono = app;
 }
 
 export function getAppHono() {
