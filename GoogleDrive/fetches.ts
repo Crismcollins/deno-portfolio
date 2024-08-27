@@ -20,7 +20,7 @@ export const fetchGoogleDriveData = async (url: string, responseType: ResponseTy
   });
 
   if (!googleDriveToken || response.status === 403 || response.status === 401) {
-    await refreshToken();
+    // await refreshToken();
     await fetchGoogleDriveData(url, responseType);
   }
   
