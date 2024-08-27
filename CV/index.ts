@@ -1,10 +1,11 @@
+import { getGoogleDriveToken } from "../GlobalStates/tokenState.ts";
 import createHeader from "./header/header.ts";
 import renderPersonalData from "./personalData/personalData.ts";
 
 const getResumeHTML = async (language: 'en' | 'es') => {
   const globalCss = await Deno.readTextFile("CV/index.css");
   const spacingsCss = await Deno.readTextFile("CV/spacings.css");
-  const token = getResumeHTML();
+  const token = getGoogleDriveToken();
   
   return `
     <html lang="${language}">
