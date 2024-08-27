@@ -1,7 +1,7 @@
 import { Hono } from "https://deno.land/x/hono@v3.4.1/mod.ts";
 
 let globalState = {
-  googleDriveToken: "",
+  googleDriveToken: null as string | null,
   appHono: null as Hono | null,
 };
 

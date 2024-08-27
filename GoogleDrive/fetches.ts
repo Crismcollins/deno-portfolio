@@ -1,5 +1,4 @@
-import { GoogleOAuth } from "https://deno.land/x/google@0.0.8/oauth.ts";
-import { getAppHono, getGoogleDriveToken, setGoogleDriveToken } from "../GlobalStates/tokenState.ts";
+import { getGoogleDriveToken, setGoogleDriveToken } from "../GlobalStates/tokenState.ts";
 import { GetLinkAuthorizeApp } from "./google.ts";
 import { Files, Folder, FolderContent, GoogleDriveFile, GoogleDriveFolder, GoogleDriveMimeType } from "./types.ts"
 
@@ -8,7 +7,6 @@ type ResponseTypes = 'json' | 'text' | 'binary';
 export const fetchGoogleDriveData = async (url: string, responseType: ResponseTypes = 'json') => {
 
   const googleDriveToken = getGoogleDriveToken();
-
   const BASE_URL = Deno.env.get("GOOGLE_DRIVE_URL");
   const finalUrl = `${BASE_URL}${url}`;
 
@@ -20,7 +18,6 @@ export const fetchGoogleDriveData = async (url: string, responseType: ResponseTy
   });
 
   if (!googleDriveToken || response.status === 403 || response.status === 401) {
-    // await refreshToken();
     await fetchGoogleDriveData(url, responseType); 
   }
   
@@ -33,36 +30,6 @@ export const fetchGoogleDriveData = async (url: string, responseType: ResponseTy
                     await response.json();
   return data;
 }
-
-// const refreshToken = async () => {
-//   console.log("WILL REFRESH TOKEN");
-//   const { link } = GetLinkAuthorizeApp()
-//   const url = 'https://accounts.google.com/o/oauth2/v2/auth'
-//   const data = {
-//     scope: ["https://www.googleapis.com/auth/drive"],
-//     access_type: 'offline',
-//     include_granted_scopes: true,
-//     redirect_uri: Deno.env.get("REDIRECT_URI") ?? '',
-//     client_id: Deno.env.get("CLIENT_ID") ?? '',
-//     response_type: 'code',
-//     // client_secret: Deno.env.get("CLIENT_SECRET") ?? '',
-//   }
-
-//   const response = await fetch(url, {
-//     method: "POST",
-//     headers: {
-//       'Content-Type': 'application/json', // Tipo de contenido
-//     },
-//     body: JSON.stringify(data),
-//   });
-
-//   if (!response.ok) {
-//     throw new Error('Error en la solicitud POST');
-//   }
-
-//   console.log("TOKEN REFRESHED")
-//   setTimeout(() => console.log("ASD"), 999999999999999)
-// }
 
 export const getGoogleDriveStorage = async () => {
   const folderID = Deno.env.get("STORAGE_ID");
@@ -110,4 +77,15 @@ export const getFileContentById = async(id: string) : Promise<string | null>=> {
   }
 
   return data;
+}
+
+export const refreshToken = async () => {
+  const { link } = GetLinkAuthorizeApp()
+  
+  const response = await fetch(link, {
+    method: "POST",
+  });
+  
+  const htmlResponse = await response.text();
+  return htmlResponse;
 }

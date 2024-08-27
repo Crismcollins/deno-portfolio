@@ -1,4 +1,6 @@
 .container {
+  display: flex;
+  justify-content: space-evenly;
   width: 100%;
   border-top: 2px solid var(--black);
   border-bottom: 2px solid var(--black);
@@ -6,10 +8,15 @@
 .containerData {
   display: flex;
   flex-direction: row;
-  gap: 32px;
-  justify-content: space-evenly;
+  gap: 8px;
+  
 }
 .info {
   display: flex;
   flex-direction: row;
+}
+.imageContainer {
+  justify-content: center;
+  align-items: center;
+  display: flex;
 }

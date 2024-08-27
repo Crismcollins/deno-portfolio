@@ -3,11 +3,12 @@ import { GetLinkAuthorizeApp, getAccessToken } from "../GoogleDrive/google.ts"
 import { getGoogleDriveToken, setGoogleDriveToken } from "../GlobalStates/tokenState.ts";
 
 export function TokenRoutes(app: Hono) {
+
   app.get("/token-status", (c) => {
 
     const googleDriveToken = getGoogleDriveToken();
 
-    if (googleDriveToken.length > 0)
+    if (googleDriveToken)
       return c.html("Token is OK")
     else {
       const { link } = GetLinkAuthorizeApp();
@@ -18,12 +19,13 @@ export function TokenRoutes(app: Hono) {
   app.get("/token-refresh", async (c) => {
     const { link } = GetLinkAuthorizeApp();
     const code = c.req.query('code');
-    
     if (!code) return c.html(`<a href="${link}">REFRESH TOKEN</a>`);
       try {
         const { token } = await getAccessToken(code);
         setGoogleDriveToken(token);
-        return c.html("Token refreshed sucessfully!!")
+        console.log('Token refreshed sucessfully!!');
+        return c.redirect('/');
+        // return c.html("Token refreshed sucessfully!!")
       } catch (e) {
         return c.json({ error: e })
       }
