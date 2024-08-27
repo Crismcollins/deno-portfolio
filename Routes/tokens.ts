@@ -18,7 +18,7 @@ export function TokenRoutes(app: Hono) {
   app.get("/token-refresh", async (c) => {
     const { link } = GetLinkAuthorizeApp();
     const code = c.req.query('code');
-  
+    
     if (!code) return c.html(`<a href="${link}">REFRESH TOKEN</a>`);
       try {
         const { token } = await getAccessToken(code);

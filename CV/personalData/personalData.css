@@ -1,0 +1,15 @@
+.container {
+  width: 100%;
+  border-top: 2px solid var(--black);
+  border-bottom: 2px solid var(--black);
+}
+.containerData {
+  display: flex;
+  flex-direction: row;
+  gap: 32px;
+  justify-content: space-evenly;
+}
+.info {
+  display: flex;
+  flex-direction: row;
+}

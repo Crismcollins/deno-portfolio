@@ -106,3 +106,22 @@ export type GoogleDriveFile = {
   id: string;
   name: string;
 }
+
+export type GoogleDriveFolder = 'icons'
+
+export enum Folder {
+  'icons'= '1nHeh8Y7MDnHcWxro4e7sKXExPdeR6FHj'
+}
+
+export type Files = {
+  kind: string;
+  mimeType: string;
+  id: string;
+  name: string;
+}
+
+export type FolderContent = {
+  kind: string;
+  incompleteSearch: boolean;
+  files: Files[]
+}
