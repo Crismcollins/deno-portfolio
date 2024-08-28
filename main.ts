@@ -7,6 +7,9 @@ import getResumeHTML from "./CV/index.ts";
 import { getGoogleDriveToken, setAppHono } from "./GlobalStates/tokenState.ts";
 import { Hono } from "https://deno.land/x/hono@v3.4.1/mod.ts";
 import { refreshToken } from "./GoogleDrive/fetches.ts";
+import { UploadModels } from "./db/index.ts";
+
+UploadModels();
 
 const app = new Hono();
 setAppHono(app);
