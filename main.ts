@@ -17,7 +17,7 @@ setAppHono(app);
 
 // Configura el middleware CORS
 app.use('/manager/*',cors({
-  origin: '*',
+  origin: ['*', 'http://localhost:3000'],
   allowHeaders: ['X-Custom-Header', 'Upgrade-Insecure-Requests'],
   allowMethods: ['GET', 'POST', 'PATCH', 'DELETE'],
   exposeHeaders: ['Content-Length', 'X-Kuma-Revision'],
