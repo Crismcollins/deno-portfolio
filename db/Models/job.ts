@@ -13,6 +13,7 @@ export class Job extends Model {
     start_date: DataTypes.DATETIME,
     end_date: DataTypes.DATETIME,
     company: DataTypes.STRING,
+    language: DataTypes.enum(['en', 'es']),
   };
 
   static user() {

@@ -9,6 +9,7 @@ export class Skill extends Model {
     id: { primaryKey: true, autoIncrement: true, type: DataTypes.INTEGER },
     name: DataTypes.STRING,
     type: DataTypes.enum(['hard', 'soft']),
+    language: DataTypes.enum(['en', 'es']),
   };
 
   static user() {

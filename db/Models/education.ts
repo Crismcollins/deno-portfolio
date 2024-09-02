@@ -12,6 +12,7 @@ export class Education extends Model {
     description: DataTypes.STRING,
     start_date: DataTypes.DATETIME,
     end_date: DataTypes.DATETIME,
+    language: DataTypes.enum(['en', 'es']),
   };
 
   static user() {

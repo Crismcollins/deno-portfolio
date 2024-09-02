@@ -14,6 +14,7 @@ export class User extends Model {
     linkedin_url: DataTypes.STRING,
     about_me: DataTypes.STRING,
     study_title: DataTypes.STRING,
+    language: DataTypes.enum(['en', 'es']),
   };
 
   static jobs() {

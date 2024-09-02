@@ -2,7 +2,6 @@ import db from "./db.ts";
 import { Education, Job, Skill, User } from "./Models/index.ts";
 
 const SyncBD = async (recreateTables: boolean) => {
-  // await db.sync();
   await db.sync({ drop: recreateTables });
 }
 

@@ -1,7 +1,8 @@
+import { Language } from "../Supabase/types.ts";
 import createHeader from "./header/header.ts";
 import renderPersonalData from "./personalData/personalData.ts";
 
-const getResumeHTML = async (language: 'en' | 'es') => {
+const getResumeHTML = async (language: Language) => {
   const globalCss = await Deno.readTextFile("CV/index.css");
   const spacingsCss = await Deno.readTextFile("CV/spacings.css");
   const personalDataCss = await Deno.readTextFile("CV/personalData/personalData.css");

@@ -1,4 +1,4 @@
-import { 
+import {
   GoogleDriveRoutes,
   FilesRoutes,
   TokenRoutes
@@ -6,13 +6,21 @@ import {
 import getResumeHTML from "./CV/index.ts";
 import { getGoogleDriveToken, setAppHono } from "./GlobalStates/tokenState.ts";
 import { Hono } from "https://deno.land/x/hono@v3.4.1/mod.ts";
+import { cors } from "https://deno.land/x/hono@v4.3.11/middleware.ts";
 import { refreshToken } from "./GoogleDrive/fetches.ts";
 import { UploadModels } from "./db/index.ts";
-
-UploadModels();
+import { ManagerRoutes } from "./Routes/manager.ts";
+import { ClientRoutes } from "./Routes/client.ts";
 
 const app = new Hono();
 setAppHono(app);
+
+// Configura el middleware CORS
+app.use('*', cors({
+  origin: '*', // Permite todas las origines, ajusta según tus necesidades
+  methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
+  headers: ['Content-Type', 'Authorization'],
+}));
 
 app.get("/", async (c) => {
   const token = getGoogleDriveToken();
@@ -26,8 +34,18 @@ app.get("/", async (c) => {
   return c.html(resumeHtml);
 });
 
+app.get("/models/create", (c) => {
+  return c.html(`<button onclick='${UploadModels()}' type="button">Create models</button> />`)
+})
+
+app.get("/models/recreate", (c) => {
+  return c.html(`<button onclick='${UploadModels(true)}' type="button">Recreate models</button> />`)
+})
+
 TokenRoutes(app);
 GoogleDriveRoutes(app);
 FilesRoutes(app);
+ClientRoutes(app);
+ManagerRoutes(app);
 
 Deno.serve(app.fetch);
