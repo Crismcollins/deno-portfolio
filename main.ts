@@ -15,10 +15,10 @@ import { ClientRoutes } from "./Routes/client.ts";
 const app = new Hono();
 setAppHono(app);
 
-app.use('/manager/*', cors({
+app.use('*', cors({
   origin: 'http://localhost:3000', // Permite todas las origines. Cambia esto si necesitas restringirlo.
-  allowHeaders: ['X-Custom-Header', 'Content-Type', 'Authorization'],
-  allowMethods: ['GET', 'POST', 'PATCH', 'DELETE'],
+  allowHeaders: ['Content-Type', 'Authorization'],
+  allowMethods: ['GET', 'POST', 'PATCH', 'DELETE', 'OPTIONS'],
   exposeHeaders: ['Content-Length', 'X-Kuma-Revision'],
   maxAge: 600,
   credentials: false,
