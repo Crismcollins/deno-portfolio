@@ -16,10 +16,13 @@ const app = new Hono();
 setAppHono(app);
 
 // Configura el middleware CORS
-app.use('*', cors({
-  origin: '*', // Permite todas las origines, ajusta según tus necesidades
-  methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
-  headers: ['Content-Type', 'Authorization'],
+app.use('/manager/*',cors({
+  origin: '*',
+  allowHeaders: ['X-Custom-Header', 'Upgrade-Insecure-Requests'],
+  allowMethods: ['GET', 'POST', 'PATCH', 'DELETE'],
+  exposeHeaders: ['Content-Length', 'X-Kuma-Revision'],
+  maxAge: 600,
+  credentials: true,
 }));
 
 app.get("/", async (c) => {
