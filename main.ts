@@ -11,6 +11,7 @@ import { refreshToken } from "./GoogleDrive/fetches.ts";
 import { UploadModels } from "./db/index.ts";
 import { ManagerRoutes } from "./Routes/manager.ts";
 import { ClientRoutes } from "./Routes/client.ts";
+import { redirectUrl } from "./Routes/middlewares.ts";
 
 const app = new Hono();
 setAppHono(app);
@@ -23,6 +24,8 @@ app.use('*', cors({
   maxAge: 600,
   credentials: false,
 }));
+
+app.use('*', redirectUrl);
 
 app.get("/", async (c) => {
   const token = getGoogleDriveToken();

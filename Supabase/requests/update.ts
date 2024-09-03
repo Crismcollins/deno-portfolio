@@ -1,46 +1,40 @@
 import supabase, { Education, Job, Skill, User } from "../index.ts";
 
 export const updateUser = async (user: User) => {
-  const { error, status, statusText } = await supabase
+  const { data, error, status } = await supabase
     .from('users')
     .update(user)
     .eq('id', user.id)
 
-    return { error, status, statusText };
+    return { data, error, status };
 }
 
 export const updateSkill = async (skill: Skill) => {
-  const { data, error } = await supabase
+  const { data, error, status } = await supabase
     .from('skills')
-    .update([ skill ])
+    .update(skill)
     .eq('id', skill.id)
-    .eq('language', skill.language);
 
     if (error) return { data: null, message: error.message };
 
-    return { data, message: 'Skill updated successfully!!'};
+    return { data, error, status };
 }
 
 export const updateJob = async (job: Job) => {
-  const { data, error } = await supabase
+  
+  const { data, error, status } = await supabase
     .from('jobs')
-    .update([ job ])
+    .update(job)
     .eq('id', job.id)
-    .eq('language', job.language);
 
-    if (error) return { data: null, message: error.message };
-
-    return { data, message: 'Job updated successfully!!'};
+    return { data, error, status };
 }
 
 export const updateEducation = async (education: Education) => {
-  const { data, error } = await supabase
+  const { data, error, status } = await supabase
     .from('educations')
-    .update([ education ])
+    .update(education)
     .eq('id', education.id)
-    .eq('language', education.language);
 
-    if (error) return { data: null, message: error.message };
-
-    return { data, message: 'Education updated successfully!!'};
+    return { data, error, status };
 }

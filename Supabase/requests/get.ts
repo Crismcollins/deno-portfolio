@@ -9,10 +9,25 @@ export const getTable = async (table: Tables, language?: Language) => {
       query.eq('language', language);
   }
 
-  const { data, error } = await query;
+  const response = await query;
 
-  return error ? { data: null, message: error.message} : { data, message: 'Get table sucessfully!!'};
+  const { data, status, statusText, error  } = response;
+
+  return { data, status, message: statusText, error };
 };
+
+export const getItem = async (table: Tables, id: number) => {
+  const query = supabase
+  .from(table)
+  .select()
+  .eq('id', id);
+
+const response = await query;
+
+const { data, status, statusText, error  } = response;
+
+return { data, status, message: statusText, error };
+}
 
 export const getCrisUser = async (language: Language = 'en') => {
   const { data, error } = await supabase

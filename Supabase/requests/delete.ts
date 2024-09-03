@@ -1,4 +1,4 @@
-import supabase, { Education, Job, Skill, User } from "../index.ts";
+import supabase, { User } from "../index.ts";
 
 export const deleteUser = async (user: User) => {
   const { data, error } = await supabase
@@ -6,40 +6,40 @@ export const deleteUser = async (user: User) => {
     .delete()
     .eq('id', user.id)
 
-    if (error) return { data: null, message: error.message};
+    if (error) return { data: null, message: error.message };
 
     return { data, message: 'User deleted successfully!!'};
 }
 
-export const deleteSkill = async (skill: Skill) => {
-  const { data, error } = await supabase
+export const deleteSkill = async (id: number) => {
+  const { data, error, status } = await supabase
     .from('skills')
     .delete()
-    .eq('id', skill.id)
+    .eq('id', id)
 
-    if (error) return { data: null, message: error.message};
+    if (error) return { data: null, message: error.message, status };
 
-    return { data, message: 'Skill deleted successfully!!'};
+    return { data, error, status };
 }
 
-export const deleteJob = async (job: Job) => {
-  const { data, error } = await supabase
+export const deleteJob = async (id: number) => {
+  const { data, error, status } = await supabase
     .from('jobs')
     .delete()
-    .eq('id', job.id)
+    .eq('id', id)
 
-    if (error) return { data: null, message: error.message};
+    if (error) return { data: null, message: error.message, status };
 
-    return { data, message: 'Job deleted successfully!!'};
+    return { data, error, status };
 }
 
-export const deleteEducation = async (education: Education) => {
-  const { data, error } = await supabase
+export const deleteEducation = async (id: number) => {
+  const { data, error, status } = await supabase
     .from('educations')
     .delete()
-    .eq('id', education.id)
+    .eq('id', id)
 
-    if (error) return { data: null, message: error.message};
+    if (error) return { data: null, message: error.message, status };
 
-    return { data, message: 'Education deleted successfully!!'};
+    return { data, error, status };
 }

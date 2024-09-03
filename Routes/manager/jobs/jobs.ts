@@ -1,61 +1,60 @@
 import { Hono } from "https://deno.land/x/hono@v3.4.1/mod.ts";
-import { HtmlData } from "../../../htmls/types.ts";
-import { baseHtml } from "../../../htmls/index.ts";
-import { jobParser } from "../../../helpers.ts";
+import { isValidJob, jobParser } from "../../../helpers.ts";
 import { addJob } from "../../../Supabase/requests/add.ts";
 import { updateJob } from "../../../Supabase/requests/update.ts";
 import { deleteJob } from "../../../Supabase/requests/delete.ts";
-import { getTable } from "../../../Supabase/requests/get.ts";
-import { Job, Language } from "../../../Supabase/index.ts";
+import { getItem } from "../../../Supabase/requests/get.ts";
 
 export const JobsRoutes = (app: Hono) => {
-  app.get('/manager/jobs/', async (c) => {
-		const { data: jobsData, message: jobsMessage } = await getTable('jobs');
 
-		if (!jobsData) return c.json({ jobsMessage }, 500);
+  app.get('/manager/jobs/:id', async (c) => {
+    const id = c.req.param('id');
+    const { data, error } = await getItem('jobs', +id);
 
-		const jobs: Job[] = jobsData;
-		const html = baseHtml({ jobs } as HtmlData)
-		return c.html(html);
-	});
-  app.get('/manager/jobs/:language', async (c) => {
-		const language = c.req.param('language');
-		const { data: jobsData, message: jobsMessage } = await getTable('jobs', language as Language);
+    if (error)
+    return c.json({ message: error }, 400);
 
-		if (!jobsData) return c.json({ jobsMessage }, 500);
+    if (data && data.length < 1)
+      return c.json([]);
 
-		const jobs: Job[] = jobsData;
-    
-		const html = baseHtml({ jobs } as HtmlData, language as Language)
-		return c.html(html);
-	});
+    if (data)
+      return c.json({ data: data[0] });
+  });
+
 	app.post('/manager/jobs', async (c) => {
-		const formData = await c.req.formData();
-		const newJob = jobParser(formData);
+		const body = await c.req.json();
+    const isValidBody = isValidJob(body);
+    
+    if (!isValidBody) return c.json({ message: 'Body is not valid'}, 400);
+    
+		const newJob = jobParser(body);
 
-		const response = await addJob(newJob);
+		const { data, status, message, error } = await addJob(newJob);
 
-		// return c.json(response);
-    return c.redirect('/manager/jobs/'+ newJob.language);
+    if (error) return c.json({ message: error }, status);
+		
+    return c.json({ data, message }, status)
 	})
 	app.patch('/manager/jobs', async (c) => {
-		const formData = await c.req.formData();
-		const job = jobParser(formData);
-
-		const { data, message } = await updateJob(job);
-
-		if (!data) return c.json({ message }, 500);
-
-		c.redirect('/manager/jobs', 303);
+    const body = await c.req.json();
+    const isValidBody = isValidJob(body);
+    
+		if (!isValidBody) return c.json({ message: 'Body is not valid'}, 400);
+    
+		const { data, status, error } = await updateJob(body);
+    
+		if (error) return c.json({ message: error.message }, status || 500);
+    
+		return c.json({ data, message: 'Job updated' }, 200);
 	})
-	app.delete('/manager/jobs', async (c) => {
-		const formData = await c.req.formData();
-		const job = jobParser(formData);
+	app.delete('/manager/jobs/:id', async (c) => {
+		const id = c.req.param('id');
+    
+    const { data, error } = await deleteJob(+id);
 
-		const { data, message } = await deleteJob(job);
+    if (error)
+      return c.json({ message: error }, 400);
 
-		if (!data) return c.json({ message }, 500);
-
-		c.redirect('/manager/jobs', 303);
+    return c.json({ data, message: 'Job deleted successfully!!' });
 	})
 }
