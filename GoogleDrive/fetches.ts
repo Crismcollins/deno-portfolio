@@ -59,7 +59,6 @@ export const getFileByName = async (imageName: string, mimeTypes?: GoogleDriveMi
   const url = `/files?q=${encodeURIComponent(query)}&fields=files(id,name,mimeType,webContentLink,webViewLink)`;
   const data = await fetchGoogleDriveData(url);
   const file:GoogleDriveFile = data.files[0];
-  
   return file;
 }
 

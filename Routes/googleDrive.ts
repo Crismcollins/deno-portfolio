@@ -11,6 +11,7 @@ export function GoogleDriveRoutes(app: Hono) {
   app.get("/profile-picture", async (c) => {
     const imageName = "cris";
     const data = await getFileByName(imageName, ['image/jpeg', 'image/png']);
-    return c.json(data);
+    const imageLink = `https://drive.google.com/thumbnail?id=${data.id}`;
+    return c.json({data: { data, imageLink } });
   });
 }
