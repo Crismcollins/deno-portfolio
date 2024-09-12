@@ -16,12 +16,6 @@ import { redirectUrl } from "./Routes/middlewares.ts";
 const app = new Hono();
 setAppHono(app);
 
-const token = getGoogleDriveToken();
-
-if (!token) {
-  await refreshToken();
-}
-
 app.use('*', cors({
   origin: '*',
   allowHeaders: ['Content-Type', 'Authorization'],
@@ -33,12 +27,16 @@ app.use('*', cors({
 
 app.use('*', redirectUrl);
 
-// app.get("/", async (c) => {
+app.get("/", async (c) => {
+  const token = getGoogleDriveToken();
 
+  if (!token) {
+    await refreshToken();
+  }
 
-//   const resumeHtml = await getResumeHTML("es");
-//   return c.html(resumeHtml);
-// });
+  const resumeHtml = await getResumeHTML("es");
+  return c.html(resumeHtml);
+});
 
 app.get("/models/create", (c) => {
   return c.html(`<button onclick='${UploadModels()}' type="button">Create models</button> />`)
