@@ -17,7 +17,7 @@ const app = new Hono();
 setAppHono(app);
 
 app.use('*', cors({
-  origin: '*',
+  origin: ['https://admin-portfolio-six.vercel.app/', 'https://crismcollins.github.io/'],
   allowHeaders: ['Content-Type', 'Authorization'],
   allowMethods: ['GET', 'POST', 'PATCH', 'DELETE', 'OPTIONS'],
   exposeHeaders: ['Content-Length', 'X-Kuma-Revision'],
