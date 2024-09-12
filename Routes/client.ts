@@ -12,7 +12,7 @@ export function ClientRoutes(app: Hono) {
     const language = c.req.param('language') as Language || 'en';
     const data = await getTable('skills', language);
 
-    if (!Array.isArray(data)) return c.json({ message: data }, 500);
+    if (!data) return c.json({ message: data }, 500);
     return c.json(data);
   });
 
@@ -30,8 +30,8 @@ export function ClientRoutes(app: Hono) {
   app.get("/client/educations/:language?", async (c) => {
     const language = c.req.param('language') as Language || 'en';
     const data = await getTable('educations', language);
-
-    if (!Array.isArray(data)) return c.json({ message: data }, 500);
+    
+    if (!data) return c.json({ message: data }, 500);
     return c.json(data);
   });
 }

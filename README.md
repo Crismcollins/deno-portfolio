@@ -1,5 +1,5 @@
 RUN PROJECT
-deno task run
+deno task start
 
 MANUAL GOOGLE DRIVE REFRESH TOKEN
 Go to /token-refresh
