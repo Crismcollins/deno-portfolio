@@ -17,7 +17,7 @@ const app = new Hono();
 setAppHono(app);
 
 app.use('*', cors({
-  origin: 'http://localhost:3000', // Permite todas las origines. Cambia esto si necesitas restringirlo.
+  origin: '*',
   allowHeaders: ['Content-Type', 'Authorization'],
   allowMethods: ['GET', 'POST', 'PATCH', 'DELETE', 'OPTIONS'],
   exposeHeaders: ['Content-Length', 'X-Kuma-Revision'],
