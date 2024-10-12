@@ -1,4 +1,8 @@
+
 import { Education, Job, Skill, User } from "./Supabase/index.ts";
+import { deleteImageByUrl } from "./Supabase/requests/storage.ts";
+import { CustomFileResponse, Game, Tables, GameResponse, UserResponse } from "./Supabase/types.ts";
+import { getItem } from "./Supabase/requests/get.ts";
 
 export async function getFileContent(filePath: string): Promise<string> {
   try {
@@ -8,36 +12,6 @@ export async function getFileContent(filePath: string): Promise<string> {
     console.error(`Error reading file ${filePath}:`, error);
     throw error;
   }
-}
-
-export const userParser = (formData: FormData) => {
-  const user: User = {
-    id: +(formData.get('id') ?? 1) as number, 
-    full_name: formData.get('full_name') as string,
-    profession: formData.get('profession') as string,
-    alias: formData.get('alias') as string,
-    email: formData.get('email') as string,
-    linkedin_url: formData.get('linkedin_url') as string,
-    about_me: formData.get('about_me') as string,
-    study_title: formData.get('study_title') as string,
-    language: (formData.get('language') as 'es' | 'en') || 'en',
-  };
-
-  return user;
-}
-
-export const jobParser = (job: Job) => {
-  const user: Job = {
-    user_id: job.user_id ?? 1,
-    company: job.company,
-    description: job.description,
-    end_date: job.end_date,
-    start_date: job.start_date,
-    title: job.title,
-    language: job.language,
-  };
-
-  return user;
 }
 
 export const isValidJob = (obj: Job): obj is Job => {
@@ -68,6 +42,7 @@ export const isValidUser = (obj: User): obj is User => {
     'alias' in obj &&
     'email' in obj &&
     'linkedin_url' in obj &&
+    'image' in obj &&
     'about_me' in obj &&
     'study_title' in obj &&
     'language' in obj &&
@@ -76,6 +51,7 @@ export const isValidUser = (obj: User): obj is User => {
     typeof obj.alias === 'string' &&
     typeof obj.email === 'string' &&
     typeof obj.linkedin_url === 'string' &&
+    isValidCustomFileResponse(obj.image) &&
     typeof obj.about_me === 'string' &&
     typeof obj.study_title === 'string' &&
     typeof obj.language === 'string'
@@ -101,6 +77,43 @@ export const isValidEducation = (obj: Education): obj is Education => {
   );
 };
 
+export const isValidGame = (obj: Game): obj is Game => {
+  return (
+    obj &&
+    typeof obj === 'object' &&
+    'user_id' in obj &&
+    'name' in obj &&
+    'description' in obj &&
+    'link' in obj &&
+    'image' in obj &&
+    'background' in obj &&
+    'duration' in obj &&
+    'language' in obj &&
+    typeof obj.user_id === 'number' &&
+    typeof obj.name === 'string' &&
+    typeof obj.description === 'string' &&
+    typeof obj.link === 'string' &&
+    isValidCustomFileResponse(obj.image) &&
+    isValidCustomFileResponse(obj.background) &&
+    typeof obj.duration === 'string' &&
+    (obj.language === 'en' || obj.language === 'es')
+  );
+};
+
+export const isValidCustomFileResponse = (file: CustomFileResponse): file is CustomFileResponse => {
+  return (
+    file &&
+    typeof file === 'object' &&
+    'id' in file &&
+    'name' in file &&
+    'url' in file &&
+    typeof file.id === 'string' &&
+    typeof file.name === 'string' &&
+    typeof file.url === 'string'
+  );
+};
+
+
 export const isValidSkill = (obj: Skill): obj is Skill => {
   return (
     obj &&
@@ -114,10 +127,68 @@ export const isValidSkill = (obj: Skill): obj is Skill => {
   );
 };
 
-
-
 export const formatDateToDDMMYYYY = (dateString: string): string => {
   const [year, month, day] = dateString.split('-');
   return `${day}-${month}-${year}`;
 };
 
+export const gameListResponseParser = (games: GameResponse[]): Game[] => {
+  return games.map(game => gameResponseParser(game));
+}
+
+export const gameResponseParser = (game: GameResponse): Game => {
+  return { ...game, image: JSON.parse(game.image), background: JSON.parse(game.background) };
+}
+
+export const userResponseParser = (user: UserResponse): User => {
+  return { ...user, image: JSON.parse(user.image) };
+}
+
+export const renameFile = (file: File, newName: string): File => {
+  const extension = file.name.split('.').pop();
+  const newFileName = `${newName}.${extension}`;
+  return new File([file], newFileName, { type: file.type });
+}
+
+export const encodeFileName = (file: File): File => {
+  const newName = sanitizeFileName(file.name);
+  return new File([file], encodeURIComponent(newName), { type: file.type });
+}
+
+export const sanitizeFileName = (fileName: string) => {
+  return fileName.replace(/[^a-zA-Z0-9-_\.]/g, '_'); // Reemplaza caracteres no permitidos
+};
+
+export const deleteImagesInStorage = async (id: number, table: Tables) => {
+  let errorMethod = null;
+
+  const { data, error, message, status } = await getItem(table, id);
+
+  if (error) {
+    errorMethod = { error, message, status }
+    return { error: errorMethod, status }
+  }
+
+  if (!data) {
+    errorMethod = { error: "id or table doesn't exist", message: 'not found' }
+    return { error: errorMethod, status: 404 }
+  }
+
+  const objData = data[0]
+
+  const { error: errorImage } = await deleteImageByUrl(objData.image);
+
+  if (errorImage) {
+    errorMethod = { error: errorImage, message: 'ocurried an error while deleting image' }
+    return { error: errorMethod, status: 500 }
+  }
+
+  const { error: errorBackground } = await deleteImageByUrl(objData.background);
+
+  if (errorBackground) {
+    errorMethod = { error: errorBackground, message: 'ocurried an error while deleting background' }
+    return { error: errorMethod, status: 500 }
+  }
+
+  return { error: errorMethod, status: 200 }
+}

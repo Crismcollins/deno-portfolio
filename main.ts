@@ -10,8 +10,9 @@ import { UploadModels } from "./db/index.ts";
 import { ManagerRoutes } from "./Routes/manager.ts";
 import { ClientRoutes } from "./Routes/client.ts";
 import { redirectUrl } from "./Routes/middlewares.ts";
-import { refreshToken } from "./GoogleDrive/fetches.ts";
+import { refreshToken } from "./GoogleDrive/getMethods.ts";
 import getResumeHTML from "./CV/index.ts";
+import { GamesRoutes } from "./Routes/manager/games/games.ts";
 
 const app = new Hono();
 setAppHono(app);
@@ -29,12 +30,12 @@ app.use('*', redirectUrl);
 
 app.get("/", async (c) => {
   const token = getGoogleDriveToken();
-  console.log(token)
+  
   if (!token) {
     await refreshToken();
   }
-  const resumeHtml = await getResumeHTML("es");
-  return c.html(resumeHtml);
+  // const resumeHtml = await getResumeHTML("es");
+  return c.text('Hello world!');
 });
 
 app.get("/models/create", (c) => {

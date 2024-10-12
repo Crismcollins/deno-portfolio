@@ -1,6 +1,9 @@
-export type Tables = 'users' | 'skills' | 'jobs' | 'educations';
+export type Tables = 'users' | 'skills' | 'jobs' | 'educations' | 'games';
 
 export type Language = 'en' | 'es';
+
+export type HttpMethod = 'PATCH' | 'PUT' | 'DELETE' | 'GET' | 'POST';
+
 
 export type User = {
   id?: number;
@@ -10,6 +13,20 @@ export type User = {
   email: string;
   linkedin_url: string;
   about_me: string;
+  image: CustomFileResponse;
+  study_title: string;
+  language: Language;
+}
+
+export type UserResponse = {
+  id?: number;
+  full_name: string;
+  profession: string;
+  alias: string;
+  email: string;
+  linkedin_url: string;
+  about_me: string;
+  image: string;
   study_title: string;
   language: Language;
 }
@@ -44,4 +61,40 @@ export type Education = {
   start_date: Date;
   end_date: Date;
   language: Language;
+}
+
+export type Game = {
+  id?: number;
+  user_id: number;
+  name: string;
+  description: string;
+  link: string;
+  image: CustomFileResponse;
+  background: CustomFileResponse;
+  duration: string;
+  language: Language;
+}
+
+export type GameResponse = {
+  id?: number;
+  user_id: number;
+  name: string;
+  description: string;
+  link: string;
+  image: string;
+  background: string;
+  duration: string;
+  language: Language;
+}
+
+export type SupabaseError = {
+  statusCode: string;
+  error: string;
+  message: string;
+} | null;
+
+export type CustomFileResponse = {
+  id: string;
+  name: string;
+  url: string;
 }

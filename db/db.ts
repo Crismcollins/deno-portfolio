@@ -1,5 +1,5 @@
 import { PostgresConnector, Database } from '../deps.ts'
-import { Education, Job, Skill, User } from "./Models/index.ts";
+import { Education, Game, Job, Skill, User } from "./Models/index.ts";
 
 const connection = new PostgresConnector({
   database: Deno.env.get('DATABASE_NAME') ?? '',
@@ -10,6 +10,6 @@ const connection = new PostgresConnector({
 });
 
 const db = new Database(connection);
-db.link([User, Job, Skill, Education]);
+db.link([User, Job, Skill, Education, Game]);
 
 export default db;

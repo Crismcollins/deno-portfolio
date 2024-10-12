@@ -43,3 +43,14 @@ export const deleteEducation = async (id: number) => {
 
     return { data, error, status };
 }
+
+export const deleteGame = async (id: number) => {
+  const { data, error, status } = await supabase
+    .from('games')
+    .delete()
+    .eq('id', id)
+
+    if (error) return { data: null, message: error.message, status };
+
+    return { data, error, status };
+}

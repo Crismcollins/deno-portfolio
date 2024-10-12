@@ -1,4 +1,4 @@
-import supabase, { Education, Job, Skill, User } from "../index.ts";
+import supabase, { Education, Job, Skill, User, Game } from "../index.ts";
 
 export const updateUser = async (user: User) => {
   const { data, error, status } = await supabase
@@ -35,6 +35,15 @@ export const updateEducation = async (education: Education) => {
     .from('educations')
     .update(education)
     .eq('id', education.id)
+
+    return { data, error, status };
+}
+
+export const updateGame = async (game: Game) => {
+  const { data, error, status } = await supabase
+    .from('games')
+    .update(game)
+    .eq('id', game.id)
 
     return { data, error, status };
 }

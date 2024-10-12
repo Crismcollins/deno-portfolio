@@ -1,5 +1,5 @@
 import { Hono } from "https://deno.land/x/hono@v3.4.1/mod.ts";
-import { getFileByName, getFileContentById } from "../GoogleDrive/fetches.ts";
+import { getFileByName, getFileContentById } from "../GoogleDrive/getMethods.ts";
 
 export function FilesRoutes(app: Hono) {
 

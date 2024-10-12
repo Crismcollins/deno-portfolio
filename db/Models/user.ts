@@ -1,5 +1,5 @@
 import { DataTypes, Model } from '../../deps.ts';
-import { Education, Job, Skill } from "./index.ts";
+import { Education, Game, Job, Skill } from "./index.ts";
 
 export class User extends Model {
   static table = 'users'; 
@@ -12,6 +12,7 @@ export class User extends Model {
     alias: DataTypes.STRING,
     email: DataTypes.STRING,
     linkedin_url: DataTypes.STRING,
+    image: DataTypes.STRING,
     about_me: DataTypes.STRING,
     study_title: DataTypes.STRING,
     language: DataTypes.enum(['en', 'es']),
@@ -27,5 +28,9 @@ export class User extends Model {
 
   static educations() {
     return this.hasMany(Education);
+  }
+
+  static games() {
+    return this.hasMany(Game);
   }
 }
