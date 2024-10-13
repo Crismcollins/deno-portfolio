@@ -10,7 +10,7 @@ export class Game extends Model {
     name: DataTypes.STRING,
     image: DataTypes.STRING,
     background: DataTypes.STRING,
-    description: DataTypes.STRING,
+    description: DataTypes.TEXT,
     link: DataTypes.STRING,
     duration: DataTypes.STRING,
     language: DataTypes.enum(['en', 'es']),

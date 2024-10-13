@@ -1,16 +1,22 @@
 import { Hono } from "https://deno.land/x/hono@v3.4.1/mod.ts";
-import { GameResponse, Language } from "../Supabase/types.ts";
+import { GameResponse, Language, UserResponse } from "../Supabase/types.ts";
 import { getTable } from "../Supabase/requests/get.ts";
-import { Game } from "../Supabase/index.ts";
-import { gameListResponseParser } from "../helpers.ts";
+import { Game, User } from "../Supabase/index.ts";
+import { gameListResponseParser, userResponseParser } from "../helpers.ts";
 
 export function ClientRoutes(app: Hono) {
 
   app.get("/client/user/:language?", async (c) => {
     const language = c.req.param('language') as Language || 'en';
-    const data = await getTable('users', language);
-    if (!data.data) return c.json({ message: data }, 500);
-    return c.json({data: data.data[0]});
+    const users = await getTable('users', language);
+
+    if (!users.data) return c.json({ message: "User doesn't exist" }, 404);
+
+    const user: UserResponse = users.data[0];
+    
+    const userParsed:User = userResponseParser(user);
+
+    return c.json({ data: userParsed }, 200);
   });
 
   app.get("/client/skills/:language?", async (c) => {
@@ -51,7 +57,6 @@ export function ClientRoutes(app: Hono) {
     if (!data) return c.json({ message: 'No games' }, 204);
 
     const games: GameResponse[] = data;
-
     const gamesParsed: Game[] = gameListResponseParser(games);
 
     return c.json({ data: gamesParsed }, status);

@@ -9,7 +9,7 @@ import { gameResponseParser } from "../../../helpers.ts";
 
 export const GamesRoutes = (app: Hono) => {
 
-  app.get('/manager/games/:language?', async (c) => {
+  app.get('/manager/games', async (c) => {
     const { data, error, status } = await getTable('games');
 
     if (error) return c.json({ message: error.message }, 400);
