@@ -1,0 +1,5 @@
+{
+  "imports": {
+    "migrate": "https://deno.land/x/migrate@0.2.5/postgres.ts"
+  }
+}

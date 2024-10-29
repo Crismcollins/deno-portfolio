@@ -1,4 +1,5 @@
 import supabase, { Language, Tables } from "../index.ts";
+import { GamesSkills } from "../types.ts";
 
 export const getTable = async (table: Tables, language?: Language) => {
   const query = supabase
@@ -38,4 +39,15 @@ export const getCrisUser = async (language: Language = 'en') => {
   if (error) return error.message;
 
   return data;
+}
+
+export const getGameSkillById = async (gameId: number) => {
+  const { data, error } = await supabase
+    .from('games_skills')
+    .select()
+    .eq('game_id', gameId);
+
+    if (error) return { data: null, message:error.message, status: error.code };
+
+    return { data: data as GamesSkills[], message: 'Game skills got successfully!!', error, status: 200 };
 }

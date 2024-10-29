@@ -1,4 +1,4 @@
-export type Tables = 'users' | 'skills' | 'jobs' | 'educations' | 'games';
+export type Tables = 'users' | 'skills' | 'jobs' | 'educations' | 'games' | 'games_skills' | 'jobs_skills';
 
 export type Language = 'en' | 'es';
 
@@ -70,6 +70,7 @@ export type Game = {
   description: string;
   link: string;
   image: CustomFileResponse;
+  video?: string;
   background: CustomFileResponse;
   duration: string;
   language: Language;
@@ -97,4 +98,10 @@ export type CustomFileResponse = {
   id: string;
   name: string;
   url: string;
+}
+
+export type GamesSkills = {
+  id: number;
+  game_id: number;
+  skill_id: number;
 }

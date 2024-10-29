@@ -44,7 +44,21 @@ export const addEducation = async (education: Education) => {
 export const addGame = async (game: Game) => {
   const { data, error, status } = await supabase
     .from('games')
-    .insert(game);
+    .insert(game)
+    .select('id');
+
+    if (error) return { data: null, message:error.message, status };
+
+    return { data: data[0].id, message: 'Game added successfully!!', error, status };
+}
+
+export const addGameSkill = async (gameId: number, skillId: number) => {
+  const { data, error, status } = await supabase
+    .from('games_skills')
+    .insert({
+      game_id: gameId,
+      skill_id: skillId
+    });
 
     if (error) return { data: null, message:error.message, status };
 

@@ -1,0 +1,39 @@
+CREATE OR REPLACE FUNCTION add_data_to_users_table()
+RETURNS VOID
+LANGUAGE plpgsql
+AS $$
+BEGIN
+    IF NOT EXISTS (
+        SELECT 1
+        FROM users
+        WHERE email = 'cris.m.collins@gmail.com'
+    ) THEN
+        INSERT INTO users 
+        (full_name, profession, alias, email, linkedin_url, image, about_me, study_title, language)
+        VALUES 
+        ('Cristóbal Molina Collins',
+        'Desarrollador de Aplicaciones Móviles y Videojuegos',
+        'crismcollins',
+        'cris.m.collins@gmail.com',
+        'https://www.linkedin.com/in/cristobal-alejandro-molina-collins-b595a8140/',
+        '{"id":"f3bb8c5f-dcc5-4ef3-8c1b-6919abfb0ee1","name":"cris.jpeg","url":"https://jdhdxwikqtgoypffioag.supabase.co/storage/v1/object/public/portfolio-storage/images/cris.jpeg"}',
+        'Tengo una pasión innata por el desarrollo mobile, con una sólida formación académica y autodidacta en base a logros, además poseo una excelente capacidad de comunicación y trabajo en equipo.',
+        'Ingeniero informático',
+        'es'
+        );
+
+        INSERT INTO users 
+        (full_name, profession, alias, email, linkedin_url, image, about_me, study_title, language)
+        VALUES 
+        ('Cristóbal Molina Collins', 
+        'Mobile and Game Developer',
+        'crismcollins',
+        'cris.m.collins@gmail.com',
+        'https://www.linkedin.com/in/cristobal-alejandro-molina-collins-b595a8140/',
+        '{"id":"f3bb8c5f-dcc5-4ef3-8c1b-6919abfb0ee1","name":"cris.jpeg","url":"https://jdhdxwikqtgoypffioag.supabase.co/storage/v1/object/public/portfolio-storage/images/cris.jpeg"}',
+        'I have an innate passion for mobile development, with a solid academic and self-taught background based on achievements, I also have excellent communication and teamwork skills.',
+        'Computer Engineer',
+        'en'
+        );
+    END IF;
+END $$;

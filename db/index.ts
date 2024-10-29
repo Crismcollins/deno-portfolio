@@ -1,3 +1,4 @@
+import { Relationships } from "../deps.ts";
 import db from "./db.ts";
 import { Education, Game, Job, Skill, User } from "./Models/index.ts";
 
@@ -6,15 +7,18 @@ const SyncBD = async (recreateTables: boolean) => {
 }
 
 const linkModelsToBD = () => {
-  db.link([User, Job, Skill, Education, Game]);
+  const GameSkill = Relationships.manyToMany(Game, Skill);
+  const JobSkill = Relationships.manyToMany(Job, Skill);
+
+  db.link([User, Education, Game, Job, Skill, GameSkill, JobSkill]);
 }
 
 export const UploadModels = async (recreateTables: boolean = false) => {
   try {
     linkModelsToBD();
     await SyncBD(recreateTables);
-    console.log("Models uploaded successfully!!")
+    return "OK Models uploaded successfully!!"
   } catch (e) {
-    console.log("ERROR: " + e)
+    return "ERROR: " + e;
   }
 }

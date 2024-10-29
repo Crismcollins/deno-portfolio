@@ -22,15 +22,15 @@ export class User extends Model {
     return this.hasMany(Job);
   }
 
-  static skills() {
-    return this.hasMany(Skill);
-  }
-
   static educations() {
     return this.hasMany(Education);
   }
 
   static games() {
     return this.hasMany(Game);
+  }
+
+  static skills() {
+    return this.hasMany(Skill);
   }
 }

@@ -2,7 +2,8 @@
 import { Education, Job, Skill, User } from "./Supabase/index.ts";
 import { deleteImageByUrl } from "./Supabase/requests/storage.ts";
 import { CustomFileResponse, Game, Tables, GameResponse, UserResponse } from "./Supabase/types.ts";
-import { getItem } from "./Supabase/requests/get.ts";
+import { getGameSkillById, getItem } from "./Supabase/requests/get.ts";
+import db from "./db/db.ts";
 
 export async function getFileContent(filePath: string): Promise<string> {
   try {
@@ -133,11 +134,39 @@ export const formatDateToDDMMYYYY = (dateString: string): string => {
 };
 
 export const gameListResponseParser = (games: GameResponse[]): Game[] => {
-  return games.map(game => gameResponseParser(game));
+  return games.map(game => {
+    return {
+      ...game,
+      image: game.image ? JSON.parse(game.image) : null,  // Maneja undefined o JSON inválido
+      background: game.background ? JSON.parse(game.background) : null  // Maneja undefined o JSON inválido
+    };
+  });
+  
+  // return games.map(game => gameResponseParser(game));
 }
 
-export const gameResponseParser = (game: GameResponse): Game => {
-  return { ...game, image: JSON.parse(game.image), background: JSON.parse(game.background) };
+export const gameResponseParser = async (game: GameResponse) => {
+  const { data, message, status, error } = await getGameSkillById(game.id!);
+
+  if (error) return { error, message, status }
+
+  if (!data) return { ...game, image: JSON.parse(game.image), background: JSON.parse(game.background), skills: [] };
+
+  const skills = await Promise.all(data.map(async (gameskill) => {
+    try {
+      const { data, error } = await getItem('skills', gameskill.skill_id);
+
+      if (error) throw new Error(error.message);
+      if (!data) return undefined;
+
+      return data[0];
+    } catch (e) {
+      return { data: null, error: e }
+    }
+  }));
+
+  
+  return { data: {...game, image: JSON.parse(game.image), background: JSON.parse(game.background), skills }, error };
 }
 
 export const userResponseParser = (user: UserResponse): User => {
@@ -191,4 +220,11 @@ export const deleteImagesInStorage = async (id: number, table: Tables) => {
   }
 
   return { error: errorMethod, status: 200 }
+}
+
+export const pingSupabasePeriodically = () => {
+  setInterval(async () => {
+    await db.ping();
+    console.log('Ping successfully!!');
+  }, 432000); //432,000 secs = 5 days
 }

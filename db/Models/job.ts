@@ -1,5 +1,5 @@
 import { DataTypes, Model, Relationships } from '../../deps.ts';
-import { User } from "./index.ts";
+import { Game, User } from "./index.ts";
 
 export class Job extends Model {
   static table = 'jobs'; 
@@ -18,6 +18,10 @@ export class Job extends Model {
 
   static user() {
     return this.hasOne(User);
+  }
+
+  static games() {
+    return this.hasMany(Game);
   }
 }
 

@@ -24,6 +24,7 @@ export function ClientRoutes(app: Hono) {
     const data = await getTable('skills', language);
 
     if (!data) return c.json({ message: data }, 500);
+
     return c.json(data);
   });
 
@@ -57,6 +58,7 @@ export function ClientRoutes(app: Hono) {
     if (!data) return c.json({ message: 'No games' }, 204);
 
     const games: GameResponse[] = data;
+
     const gamesParsed: Game[] = gameListResponseParser(games);
 
     return c.json({ data: gamesParsed }, status);

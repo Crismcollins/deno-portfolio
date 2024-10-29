@@ -11,11 +11,11 @@ export const UserRoutes = (app: Hono) => {
   app.get("/manager/user/:language", async (c) => {
     const language = c.req.param('language');
     const userData = await getCrisUser(language as Language);
-
+    
     if (!userData) return c.json({ message: "Couldn't get user data" }, 500);
 
     const user: UserResponse = userData[0];
-
+    
     if (!user) return c.json({ message: 'User not found' }, 404);
 
     const userParsed:User = userResponseParser(user);
