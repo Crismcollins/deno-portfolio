@@ -2,7 +2,7 @@ import { Hono } from "https://deno.land/x/hono@v3.4.1/mod.ts";
 import { getItem, getTable } from "../../../Supabase/requests/get.ts";
 import { Game, GameResponse } from "../../../Supabase/types.ts";
 import { addGame, addGameSkill } from "../../../Supabase/requests/add.ts";
-import { deleteImagesInStorage, isValidGame, gameListResponseParser } from "../../../helpers.ts";
+import { deleteImagesInStorage, isValidGame, gameListResponseParser, convertToEmbedUrl } from "../../../helpers.ts";
 import { updateGame } from "../../../Supabase/requests/update.ts";
 import { deleteGame } from "../../../Supabase/requests/delete.ts";
 import { gameResponseParser } from "../../../helpers.ts";
@@ -42,14 +42,18 @@ export const GamesRoutes = (app: Hono) => {
 
   app.post('/manager/games', async (c) => {
     const body = await c.req.json();
-
+    
     const { skills, ...rest } = body;
     
     const isValidBody = isValidGame(rest);
 
     if (!isValidBody) return c.json({ message: 'Body is not valid'}, 400);
 
-    const { error: errorAddGame, message, status, data } = await addGame(rest);
+    const youtubeUrlEmbed = convertToEmbedUrl(rest.video ?? '')
+
+    const game: Game = {...rest, video: youtubeUrlEmbed ?? rest.video }
+
+    const { error: errorAddGame, message, status, data } = await addGame(game);
     
     if (!skills || skills.length <= 0)
       return c.json({ errorAddGame, message }, status);
@@ -77,7 +81,11 @@ export const GamesRoutes = (app: Hono) => {
 
     if (!isValidBody) return c.json({ message: 'Body is not valid'}, 400);
     
-    const { error, status, statusText } = await updateGame(rest, skills);
+    const youtubeUrlEmbed = convertToEmbedUrl(rest.video ?? '')
+    
+    const game: Game = {...rest, video: youtubeUrlEmbed ?? rest.video }
+    
+    const { error, status, statusText } = await updateGame(game, skills);
     
     if (error) return c.json({ error, statusText, status }, status as number);
 

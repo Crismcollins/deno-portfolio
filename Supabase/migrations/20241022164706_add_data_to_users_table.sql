@@ -9,7 +9,7 @@ BEGIN
         WHERE email = 'cris.m.collins@gmail.com'
     ) THEN
         INSERT INTO users 
-        (full_name, profession, alias, email, linkedin_url, image, about_me, study_title, language)
+        (full_name, profession, alias, email, linkedin_url, image, about_me, study_title, language, location, phone_number, github_url)
         VALUES 
         ('Cristóbal Molina Collins',
         'Desarrollador de Aplicaciones Móviles y Videojuegos',
@@ -19,11 +19,14 @@ BEGIN
         '{"id":"f3bb8c5f-dcc5-4ef3-8c1b-6919abfb0ee1","name":"cris.jpeg","url":"https://jdhdxwikqtgoypffioag.supabase.co/storage/v1/object/public/portfolio-storage/images/cris.jpeg"}',
         'Tengo una pasión innata por el desarrollo mobile, con una sólida formación académica y autodidacta en base a logros, además poseo una excelente capacidad de comunicación y trabajo en equipo.',
         'Ingeniero informático',
-        'es'
+        'es',
+        'Santiago, Chile',
+        '+56989050986',
+        'https://github.com/Crismcollins'
         );
 
         INSERT INTO users 
-        (full_name, profession, alias, email, linkedin_url, image, about_me, study_title, language)
+        (full_name, profession, alias, email, linkedin_url, image, about_me, study_title, language, location, phone_number, github_url)
         VALUES 
         ('Cristóbal Molina Collins', 
         'Mobile and Game Developer',
@@ -33,7 +36,10 @@ BEGIN
         '{"id":"f3bb8c5f-dcc5-4ef3-8c1b-6919abfb0ee1","name":"cris.jpeg","url":"https://jdhdxwikqtgoypffioag.supabase.co/storage/v1/object/public/portfolio-storage/images/cris.jpeg"}',
         'I have an innate passion for mobile development, with a solid academic and self-taught background based on achievements, I also have excellent communication and teamwork skills.',
         'Computer Engineer',
-        'en'
+        'en',
+        'Santiago, Chile',
+        '+56989050986',
+        'https://github.com/Crismcollins'
         );
     END IF;
 END $$;

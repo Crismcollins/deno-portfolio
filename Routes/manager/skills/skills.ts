@@ -34,7 +34,7 @@ export const SkillsRoutes = (app:Hono) => {
 	app.post('/manager/skills', async (c) => {
 		const body = await c.req.json();
 		const isValidBody = isValidSkill(body);
-    console.log(body);
+    
     if (!isValidBody) return c.json({ message: 'Body is not valid'}, 400);
 
 		const { data, error, status } = await addSkill(body);

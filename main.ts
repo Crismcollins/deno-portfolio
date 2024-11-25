@@ -30,13 +30,6 @@ app.use('*', cors({
 app.use('*', redirectUrl);
 
 app.get("/", async (c) => {
-  // const token = getGoogleDriveToken();
-
-  // if (!token) {
-  //   await refreshToken();
-  // }
-  // const resumeHtml = await getResumeHTML("es");
-
   return c.text('Hello world!');
 });
 
@@ -45,6 +38,12 @@ app.get("/models/create", async (c) => {
   const { error } = await executeAllMigrations();
 
   return c.html(`<p>MODELS STATUS: ${message}</p><br><p>MIGRATION STATUS: ${error}</p>`)
+})
+
+app.get("/models/migrations", async (c) => {
+  const { error } = await executeAllMigrations();
+
+  return c.html(`<p>MIGRATION STATUS: ${error ?? 'Migrations executed successfully!!'}</p>`)
 })
 
 TokenRoutes(app);

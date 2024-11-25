@@ -9,8 +9,9 @@ const SyncBD = async (recreateTables: boolean) => {
 const linkModelsToBD = () => {
   const GameSkill = Relationships.manyToMany(Game, Skill);
   const JobSkill = Relationships.manyToMany(Job, Skill);
+  const JobGame = Relationships.manyToMany(Job, Game);
 
-  db.link([User, Education, Game, Job, Skill, GameSkill, JobSkill]);
+  db.link([User, Education, Game, Job, Skill, GameSkill, JobSkill, JobGame]);
 }
 
 export const UploadModels = async (recreateTables: boolean = false) => {

@@ -1,9 +1,10 @@
 import { Hono } from "https://deno.land/x/hono@v3.4.1/mod.ts";
 import { getItem, getTable } from "../../../Supabase/requests/get.ts";
-import { isValidEducation } from "../../../helpers.ts";
+import { educationResponseParser, isValidEducation } from "../../../helpers.ts";
 import { addEducation } from "../../../Supabase/requests/add.ts";
 import { updateEducation } from "../../../Supabase/requests/update.ts";
 import { deleteEducation } from "../../../Supabase/requests/delete.ts";
+import { CustomFileResponse, Education, EducationManager, EducationResponse } from "../../../Supabase/types.ts";
 
 export const EducationsRoutes = (app:Hono) => {
   app.get('/manager/educations', async (c) => {
@@ -18,7 +19,17 @@ export const EducationsRoutes = (app:Hono) => {
 
 		if (error) return c.json({ message: error.message }, 400);
 
-		return c.json({ data }, 200);
+		if (!data) return c.json({ data: {} }, 200);
+
+		const educationResponse: EducationResponse = data[0];
+		// const education: Education = educationResponseParser(educationResponse);
+		const education: EducationManager = {
+			...educationResponse,
+			logo: JSON.parse(educationResponse.logo)
+		}
+		
+
+		return c.json({ data: education }, 200);
 	});
 
 	app.post('/manager/educations', async (c) => {

@@ -13,7 +13,9 @@ export class Game extends Model {
     video: DataTypes.STRING,
     description: DataTypes.TEXT,
     link: DataTypes.STRING,
-    duration: DataTypes.STRING,
+    ios_link: DataTypes.TEXT,
+    android_link: DataTypes.TEXT,
+    date_release: DataTypes.DATETIME,
     language: DataTypes.enum(['en', 'es']),
   };
 

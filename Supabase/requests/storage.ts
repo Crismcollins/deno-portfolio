@@ -11,7 +11,7 @@ export const addImageToStorage = async (file: File) => {
   return { data, error }
 }
 
-export const getImageLink = async (url: string) => {
+export const getFileStorageLink = async (url: string) => {
   const image = await supabase
     .storage
     .from('portfolio-storage')

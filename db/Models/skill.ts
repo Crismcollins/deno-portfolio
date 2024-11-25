@@ -10,7 +10,7 @@ export class Skill extends Model {
     name: DataTypes.STRING,
     type: DataTypes.enum(['hard', 'soft']),
     image: DataTypes.STRING,
-    language: DataTypes.enum(['en', 'es']),
+    language: DataTypes.enum(['en', 'es', 'both']),
   };
 
   static user() {

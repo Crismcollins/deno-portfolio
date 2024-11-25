@@ -9,11 +9,16 @@ export class Job extends Model {
     id: { primaryKey: true, autoIncrement: true, type: DataTypes.INTEGER },
     userId: DataTypes.STRING, 
     title: DataTypes.STRING,
-    description: DataTypes.STRING,
+    description: DataTypes.TEXT,
     start_date: DataTypes.DATETIME,
     end_date: DataTypes.DATETIME,
     company: DataTypes.STRING,
     language: DataTypes.enum(['en', 'es']),
+    company_description: DataTypes.TEXT,
+    achievements: DataTypes.TEXT,
+    location: DataTypes.TEXT,
+    contact: DataTypes.TEXT,
+    logo: DataTypes.TEXT,
   };
 
   static user() {
