@@ -2,7 +2,7 @@
 import { Education, Job, Skill, User } from "./Supabase/index.ts";
 import { deleteImageByUrl } from "./Supabase/requests/storage.ts";
 import { CustomFileResponse, Game, Tables, GameResponse, UserResponse, JobResponse, EducationResponse, JobsGames, JobsSkills } from "./Supabase/types.ts";
-import { getGameSkillById, getItem, getJobGameById, getJobSkillById } from "./Supabase/requests/get.ts";
+import { getGameSkillById, getItem, getJobGameById, getJobSkillById, getTable } from "./Supabase/requests/get.ts";
 import db from "./db/db.ts";
 
 export async function getFileContent(filePath: string): Promise<string> {
@@ -336,9 +336,9 @@ export const deleteImagesInStorage = async (id: number, table: Tables) => {
 
 export const pingSupabasePeriodically = () => {
   setInterval(async () => {
-    await db.ping();
+    await getTable('users', 'en');
     console.log('Ping successfully!!');
-  }, 432000); //432,000 secs = 5 days
+  }, 600000);
 }
 
 export function convertToEmbedUrl(url: string): string | null {
