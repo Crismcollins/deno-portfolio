@@ -12,6 +12,3 @@ Go to /token-status
 
 CREATE MODELS TO BD
 Go to /models/create
-
-RECREATE MODELS TO BD
-Go to /models/recreate

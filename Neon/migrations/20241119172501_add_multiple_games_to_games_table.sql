@@ -1,3 +1,17 @@
+CREATE TABLE IF NOT EXISTS games (
+    id SERIAL PRIMARY KEY,
+    name VARCHAR(255),
+    image TEXT,
+    background VARCHAR(255),
+    video TEXT,
+    description TEXT,
+    link VARCHAR(255),
+    ios_link TEXT,
+    android_link TEXT,
+    date_release TIMESTAMP,
+    language VARCHAR(5) CHECK (language IN ('en', 'es'))
+);
+
 CREATE OR REPLACE FUNCTION add_multiple_games_to_games_table()
 RETURNS VOID
 LANGUAGE plpgsql
@@ -12,7 +26,7 @@ BEGIN
         (user_id, name, image, background, video, link, ios_link, android_link, date_release, language, description)
         VALUES 
         (
-            '1',
+            1,
             'Snake & Blocks',
             '{"id":"b989d4f7-3d6e-4f72-9754-7323349fe3a8","name":"snakeblocks.png","url":"https://jdhdxwikqtgoypffioag.supabase.co/storage/v1/object/public/portfolio-storage/images/snakeblocks.png"}',
             '{"id":"8df8efdc-a79a-4fb6-97ab-f8e12bfc5be8","name":"background-snakeblocks__1_.png","url":"https://jdhdxwikqtgoypffioag.supabase.co/storage/v1/object/public/portfolio-storage/images/background-snakeblocks__1_.png"}',
@@ -35,7 +49,7 @@ BEGIN
         (user_id, name, image, background, video, link, ios_link, android_link, date_release, language, description)
         VALUES 
         (
-            '1',
+            1,
             'SodaPop Game',
             '{"id":"322b0ada-1bdb-428f-a609-ab8c0f09b276","name":"sodapop.png","url":"https://jdhdxwikqtgoypffioag.supabase.co/storage/v1/object/public/portfolio-storage/images/sodapop.png"}',
             '{"id":"7065a6ee-2de7-4439-812d-4d7f949d8309","name":"background-sodapop.png","url":"https://jdhdxwikqtgoypffioag.supabase.co/storage/v1/object/public/portfolio-storage/images/background-sodapop.png"}',
@@ -58,7 +72,7 @@ BEGIN
         (user_id, name, image, background, video, link, ios_link, android_link, date_release, language, description)
         VALUES 
         (
-            '1',
+            1,
             'Rock Paper & Scissor Duel!',
             '{"id":"03bd3717-3719-483d-bbe8-7b445c7717fb","name":"rpsduel.png","url":"https://jdhdxwikqtgoypffioag.supabase.co/storage/v1/object/public/portfolio-storage/images/rpsduel.png"}',
             '{"id":"29f63a24-89dc-4a0d-b79c-c674634e99a1","name":"background-rpsduel.png","url":"https://jdhdxwikqtgoypffioag.supabase.co/storage/v1/object/public/portfolio-storage/images/background-rpsduel.png"}',
@@ -97,7 +111,7 @@ ADVERTENCIA: No apto para cobardes. Esta IA no pudo ser derrotada ni con el salt
         (user_id, name, image, background, video, link, ios_link, android_link, date_release, language, description)
         VALUES 
         (
-            "1",
+            1,
             'Meydey',
             '{"id":"f5f23acb-0aa8-40a9-82d7-d7e3ad62275c","name":"Meydey.png","url":"https://jdhdxwikqtgoypffioag.supabase.co/storage/v1/object/public/portfolio-storage/images/Meydey.png"}',
             '{"id":"489b10d0-1302-427e-9aca-25583ac295d0","name":"background-meydey.png","url":"https://jdhdxwikqtgoypffioag.supabase.co/storage/v1/object/public/portfolio-storage/images/background-meydey.png"}',
@@ -124,7 +138,7 @@ ADVERTENCIA: No apto para cobardes. Esta IA no pudo ser derrotada ni con el salt
         (user_id, name, image, background, video, link, ios_link, android_link, date_release, language, description)
         VALUES 
         (
-            '2',
+            2,
             'Snake & Blocks',
             '{"id":"b989d4f7-3d6e-4f72-9754-7323349fe3a8","name":"snakeblocks.png","url":"https://jdhdxwikqtgoypffioag.supabase.co/storage/v1/object/public/portfolio-storage/images/snakeblocks.png"}',
             '{"id":"8df8efdc-a79a-4fb6-97ab-f8e12bfc5be8","name":"background-snakeblocks__1_.png","url":"https://jdhdxwikqtgoypffioag.supabase.co/storage/v1/object/public/portfolio-storage/images/background-snakeblocks__1_.png"}',
@@ -147,7 +161,7 @@ ADVERTENCIA: No apto para cobardes. Esta IA no pudo ser derrotada ni con el salt
         (user_id, name, image, background, video, link, ios_link, android_link, date_release, language, description)
         VALUES 
         (
-            '2',
+            2,
             'SodaPop Game',
             '{"id":"322b0ada-1bdb-428f-a609-ab8c0f09b276","name":"sodapop.png","url":"https://jdhdxwikqtgoypffioag.supabase.co/storage/v1/object/public/portfolio-storage/images/sodapop.png"}',
             '{"id":"7065a6ee-2de7-4439-812d-4d7f949d8309","name":"background-sodapop.png","url":"https://jdhdxwikqtgoypffioag.supabase.co/storage/v1/object/public/portfolio-storage/images/background-sodapop.png"}',
@@ -170,7 +184,7 @@ ADVERTENCIA: No apto para cobardes. Esta IA no pudo ser derrotada ni con el salt
         (user_id, name, image, background, video, link, ios_link, android_link, date_release, language, description)
         VALUES 
         (
-            '2',
+            2,
             'Rock Paper & Scissor Duel!',
             '{"id":"03bd3717-3719-483d-bbe8-7b445c7717fb","name":"rpsduel.png","url":"https://jdhdxwikqtgoypffioag.supabase.co/storage/v1/object/public/portfolio-storage/images/rpsduel.png"}',
             '{"id":"29f63a24-89dc-4a0d-b79c-c674634e99a1","name":"background-rpsduel.png","url":"https://jdhdxwikqtgoypffioag.supabase.co/storage/v1/object/public/portfolio-storage/images/background-rpsduel.png"}',
@@ -209,7 +223,7 @@ Can you defeat the mighty "The Rock AI"? We''ll find out soon...'
         (user_id, name, image, background, video, link, ios_link, android_link, date_release, language, description)
         VALUES 
         (
-            '2',
+            2,
             'Meydey',
             '{"id":"f5f23acb-0aa8-40a9-82d7-d7e3ad62275c","name":"Meydey.png","url":"https://jdhdxwikqtgoypffioag.supabase.co/storage/v1/object/public/portfolio-storage/images/Meydey.png"}',
             '{"id":"489b10d0-1302-427e-9aca-25583ac295d0","name":"background-meydey.png","url":"https://jdhdxwikqtgoypffioag.supabase.co/storage/v1/object/public/portfolio-storage/images/background-meydey.png"}',
@@ -227,3 +241,5 @@ Access your medical record.'
         );
     END IF;
 END $$;
+
+SELECT add_multiple_games_to_games_table();

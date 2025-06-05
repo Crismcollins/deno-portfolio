@@ -1,6 +1,20 @@
 import { Relationships } from "../deps.ts";
+import client from "./client.ts";
 import db from "./db.ts";
 import { Education, Game, Job, Skill, User } from "./Models/index.ts";
+
+export const openConnection = async () => {
+  await client.connect();
+}
+
+export const executeQuery = async (query: string) => {
+  const result = await client.queryArray(query);
+  return result;
+}
+
+export const closeConnection = async () => {
+  await client.end();
+}
 
 const SyncBD = async (recreateTables: boolean) => {
   await db.sync({ drop: recreateTables });

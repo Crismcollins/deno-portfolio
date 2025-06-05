@@ -1,3 +1,16 @@
+CREATE TABLE IF NOT EXISTS educations (
+    id SERIAL PRIMARY KEY,
+    title VARCHAR(255),
+    institution VARCHAR(255),
+    description TEXT,
+    start_date TIMESTAMP,
+    end_date TIMESTAMP,
+    language VARCHAR(5) CHECK (language IN ('en', 'es')),
+    location TEXT,
+    logo TEXT
+);
+
+
 CREATE OR REPLACE FUNCTION add_education_to_table()
 RETURNS VOID
 LANGUAGE plpgsql
@@ -39,3 +52,5 @@ BEGIN
         VALUES ('2', 'English course B1+', 'EClass', null, '2020-12-09', '2021-03-09', 'en', 'Online', '{"id":"033cd7cc-8ab7-4e98-a9a8-622ee28c7683","name":"eClass-Logo.png","url":"https://jdhdxwikqtgoypffioag.supabase.co/storage/v1/object/public/portfolio-storage/images/eClass-Logo.png","type":"image"}');
     END IF;
 END $$;
+
+SELECT add_education_to_table();

@@ -1,3 +1,19 @@
+CREATE TABLE IF NOT EXISTS users (
+    id SERIAL PRIMARY KEY,
+    full_name VARCHAR(255),
+    profession VARCHAR(255),
+    alias VARCHAR(255),
+    email VARCHAR(255),
+    linkedin_url VARCHAR(255),
+    github_url VARCHAR(255),
+    location VARCHAR(255),
+    phone_number VARCHAR(255),
+    image TEXT,
+    about_me TEXT,
+    study_title VARCHAR(255),
+    language VARCHAR(5) CHECK (language IN ('en', 'es', 'both'))
+);
+
 CREATE OR REPLACE FUNCTION add_data_to_users_table()
 RETURNS VOID
 LANGUAGE plpgsql
@@ -43,3 +59,5 @@ BEGIN
         );
     END IF;
 END $$;
+
+SELECT add_data_to_users_table();

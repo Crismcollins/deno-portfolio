@@ -6,17 +6,15 @@ import {
 import { setAppHono } from "./GlobalStates/tokenState.ts";
 import { Hono } from "https://deno.land/x/hono@v3.4.1/mod.ts";
 import { cors } from "https://deno.land/x/hono@v4.3.11/middleware.ts";
-import { UploadModels } from "./db/index.ts";
+// import { UploadModels } from "./db/index.ts";
 import { ManagerRoutes } from "./Routes/manager.ts";
 import { ClientRoutes } from "./Routes/client.ts";
-import { redirectUrl } from "./Routes/middlewares.ts";
-import { pingSupabasePeriodically } from "./helpers.ts";
+import { redirectUrl } from "./Routes/middlewares.ts"
 import { executeAllMigrations } from "./db/Migrations/index.ts";
+import { UploadModels } from "./db/index.ts";
 
 const app = new Hono();
 setAppHono(app);
-
-pingSupabasePeriodically();
 
 app.use('*', cors({
   origin: '*',
@@ -29,7 +27,7 @@ app.use('*', cors({
 
 app.use('*', redirectUrl);
 
-app.get("/", async (c) => {
+app.get("/", (c) => {
   return c.text('Hello world!');
 });
 

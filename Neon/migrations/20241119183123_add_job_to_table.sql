@@ -1,3 +1,20 @@
+CREATE TABLE IF NOT EXISTS jobs (
+    id SERIAL PRIMARY KEY,
+    user_id VARCHAR(255),
+    title VARCHAR(255),
+    description TEXT,
+    start_date TIMESTAMP,
+    end_date TIMESTAMP,
+    company VARCHAR(255),
+    language VARCHAR(5) CHECK (language IN ('en', 'es')),
+    company_description TEXT,
+    achievements TEXT,
+    location VARCHAR(255),
+    contact VARCHAR(255),
+    logo TEXT
+);
+
+
 CREATE OR REPLACE FUNCTION add_job_to_table()
 RETURNS VOID
 LANGUAGE plpgsql
@@ -6,11 +23,11 @@ BEGIN
     IF NOT EXISTS (
         SELECT 1
         FROM jobs
-        WHERE title = 'Líder Técnico Front-end' AND user_id = '1'
+        WHERE title = 'Líder Técnico Front-end' AND user_id = 1
     ) THEN
         INSERT INTO jobs (user_id, title, description, start_date, end_date, company, language, company_description, achievements, location, contact, logo)
         VALUES (
-            '1', 
+            1,
             'Líder Técnico Front-end', 
             '• Desarrollo de videojuegos y sitios web de manera rápida y fluída.
 • Trabajar de manera colaborativa con diseñadores y testers para diseñar soluciones innovadoras y resolver problemas de manera metódica en los sistemas de producción.
@@ -32,11 +49,11 @@ y eficaz. Facilitando a profesores la enseñanza de negocio.',
     IF NOT EXISTS (
         SELECT 1
         FROM jobs
-        WHERE title = 'Desarrollador mobile' AND user_id = '1'
+        WHERE title = 'Desarrollador mobile' AND user_id = 1
     ) THEN
         INSERT INTO jobs (user_id, title, description, start_date, end_date, company, language, company_description, achievements, location, contact, logo)
         VALUES (
-            '1', 
+            1,
             'Desarrollador mobile', 
             '• Diseño y desarrollo de aplicaciones móviles desde el concepto en base a metodologías de diseño de software.
 • Diseño de interfaces de usuario.
@@ -56,11 +73,11 @@ y eficaz. Facilitando a profesores la enseñanza de negocio.',
     IF NOT EXISTS (
         SELECT 1
         FROM jobs
-        WHERE title = 'Ingeniero de sistemas' AND user_id = '1'
+        WHERE title = 'Ingeniero de sistemas' AND user_id = 1
     ) THEN
         INSERT INTO jobs (user_id, title, description, start_date, end_date, company, language, company_description, achievements, location, contact, logo)
         VALUES (
-            '1', 
+            1,
             'Ingeniero de sistemas', 
             '• Desarrollo de interfaces web responsivas.
 • Desarrollo de aplicaciones móviles para Android y iOS.
@@ -156,3 +173,5 @@ para la contratación de consultas de salud de manera amigable y cercana.',
     END IF;
 END;
 $$;
+
+SELECT add_job_to_table();

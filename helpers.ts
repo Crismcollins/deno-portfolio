@@ -334,13 +334,6 @@ export const deleteImagesInStorage = async (id: number, table: Tables) => {
   return { error: errorMethod, status: 200 }
 }
 
-export const pingSupabasePeriodically = () => {
-  setInterval(async () => {
-    await getTable('users', 'en');
-    console.log('Ping successfully!!');
-  }, 600000);
-}
-
 export function convertToEmbedUrl(url: string): string | null {
   const videoIdMatch = url.match(/(?:https?:\/\/)?(?:www\.)?youtube\.com\/watch\?v=([^&]+)/);
 
@@ -348,6 +341,12 @@ export function convertToEmbedUrl(url: string): string | null {
     const videoId = videoIdMatch[1];
     return `https://www.youtube.com/embed/${videoId}`;
   }
-  console.log("EMBED: " + url)
+  
   return url;
+}
+
+export function requireEnv(name: string | undefined): string {
+  const value = Deno.env.get(name);
+  if (!value) throw new Error(`Missing env var: ${name}`);
+  return value;
 }
