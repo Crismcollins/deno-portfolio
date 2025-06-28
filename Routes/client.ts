@@ -1,5 +1,5 @@
-import { EducationResponse, GameResponse, JobResponse, Language, Skill, UserResponse } from "../Neon/types.ts";
-import { getTable } from "../Neon/requests/get.ts";
+import { EducationResponse, GameResponse, Job, JobResponse, Language, Skill, UserResponse, JobsSkills, JobsGames } from "../Neon/types.ts";
+import { getItem, getItems, getTable } from "../Neon/requests/get.ts";
 import { HonoType } from "../deps.ts";
 
 export function ClientRoutes(app: HonoType) {
@@ -41,9 +41,39 @@ export function ClientRoutes(app: HonoType) {
     
     if (!data.data) return c.json({ data: [] }, 200);
     
-    const jobsResponse: JobResponse[] = data.data;
-    
-    return c.json({ data: jobsResponse });
+    const jobsResponse: Job[] = data.data;
+
+    const jobs: JobResponse[] = await Promise.all(
+      jobsResponse.map(async (jobResponse) => {
+        const { data, error } = await getItem('jobs_skills', jobResponse.id, 'job_id');
+        
+        if (error) throw new Error(error);
+  
+        const jobsSkills: JobsSkills[] = data;
+        
+        const jobsSkillsIds: number[] = jobsSkills.map(jobSkill => jobSkill.skill_id);
+        
+        const { data: skills, error: skillsError } = await getItems('skills', jobsSkillsIds);
+
+        if (skillsError) throw new Error(skillsError);
+
+        const { data: jobGamesData, error: jobsGamesError } = await getItem('jobs_games', jobResponse.id, 'job_id');
+  
+        if (jobsGamesError) throw new Error(jobsGamesError);
+  
+        const jobsGames: JobsGames[] = jobGamesData;
+
+        const jobsGamesIds: number[] = jobsGames.map(jobGames => jobGames.game_id);
+
+        const { data: games, error: gamesError } = await getItems('games', jobsGamesIds)
+
+        if (gamesError) throw new Error(gamesError);
+  
+        return { ...jobResponse, skills, games };
+      })
+    )
+
+    return c.json({ data: jobs });
   });
 
   app.get("/client/educations/:language?", async (c) => {

@@ -60,15 +60,15 @@ export const getItems = async (
 
     return {
       data,
-      status: 200 as StatusCode,
-      message: 'OK',
+      skillsStatus: 200 as StatusCode,
+      skillsMessage: 'OK',
       error: null,
     };
   } catch (error) {
     return {
       data: [],
-      status: 500 as StatusCode,
-      message: 'Error',
+      skillsStatus: 500 as StatusCode,
+      skillsMessage: 'Error',
       error: error.message,
     };
   }

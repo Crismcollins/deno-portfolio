@@ -27,7 +27,7 @@ export const JobsRoutes = (app: HonoType) => {
     const jobSkills: JobsSkills[] = jobsSkillsData;
     const jobSkillsIds: number[] = jobSkills.map(jobSkill => jobSkill.skill_id);
     
-    const { data: skills, error: skillsError, message: skillsMessage, status: skillsStatus} = await getItems('skills',jobSkillsIds);
+    const { data: skills, error: skillsError, skillsMessage: skillsMessage, skillsStatus: skillsStatus} = await getItems('skills',jobSkillsIds);
 
     if (skillsError) return c.json({ message: skillsMessage }, skillsStatus);
 
@@ -38,7 +38,7 @@ export const JobsRoutes = (app: HonoType) => {
     const gamesOfJob: JobsGames[] = jobGames;
     const jobGamesIds: number[] = gamesOfJob.map( gameJob => gameJob.game_id);
 
-    const { data: games, error: errorGames, message: messageGames, status: statusGames } = await getItems('games', jobGamesIds);
+    const { data: games, error: errorGames, skillsMessage: messageGames, skillsStatus: statusGames } = await getItems('games', jobGamesIds);
 
     if (errorGames) return c.json({ message: messageGames },statusGames);
 

@@ -25,7 +25,7 @@ export const GamesRoutes = (app: HonoType) => {
 
     const skillsId: number[] = games_skills.map(skill => skill.skill_id);
 
-    const { data: skills, error: errorSkills, message: messageSkills, status: statusSkills } = await getItems('skills', skillsId);
+    const { data: skills, error: errorSkills, skillsMessage: messageSkills, skillsStatus: statusSkills } = await getItems('skills', skillsId);
     
     if (errorSkills) return c.json({ messageSkills }, statusSkills);
 
