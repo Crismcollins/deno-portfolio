@@ -1,4 +1,4 @@
-import { Education, Job, Skill, User } from "../Supabase/index.ts";
+import { Education, Job, Skill, User } from "../Neon/index.ts";
 
 export type HtmlData = {
   user: User;

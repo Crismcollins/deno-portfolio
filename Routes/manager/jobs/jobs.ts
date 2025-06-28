@@ -1,12 +1,12 @@
-import { Hono } from "https://deno.land/x/hono@v3.4.1/mod.ts";
-import { isValidJob, jobGamesParser, jobSkillParser } from "../../../helpers.ts";
-import { addJob, addJobGame, addJobSkill } from "../../../Supabase/requests/add.ts";
-import { updateJob } from "../../../Supabase/requests/update.ts";
-import { deleteJob } from "../../../Supabase/requests/delete.ts";
-import { getItem } from "../../../Supabase/requests/get.ts";
-import { Job, JobResponse } from "../../../Supabase/types.ts";
+import { isValidJob } from "../../../helpers.ts";
+import { addItemToTable, addRelation } from "../../../Neon/requests/add.ts";
+import { updateRelationTable, updateTable } from "../../../Neon/requests/update.ts";
+import { deleteItem } from "../../../Neon/requests/delete.ts";
+import { getItem, getItems } from "../../../Neon/requests/get.ts";
+import { Job, JobResponse, JobsGames, JobsSkills } from "../../../Neon/types.ts";
+import { HonoType } from "../../../deps.ts";
 
-export const JobsRoutes = (app: Hono) => {
+export const JobsRoutes = (app: HonoType) => {
 
   app.get('/manager/jobs/:id', async (c) => {
     const id = c.req.param('id');
@@ -18,16 +18,32 @@ export const JobsRoutes = (app: Hono) => {
     if (!data)
       return c.json([]);
     
-    const jobResponse: JobResponse = data[0];
+    const jobResponse: Job = data[0];
 
-    const { data: jobGameData, error: jobGameError, status: jobGameStatus } = await jobGamesParser(jobResponse);
+    const { data: jobsSkillsData, error: jobsSkillsError, message, status } = await getItem("jobs_skills", +id, 'job_id');
 
-    if (jobGameError) return c.json({ message: jobGameError }, jobGameStatus);
+    if (jobsSkillsError) return c.json({ message }, status);
+
+    const jobSkills: JobsSkills[] = jobsSkillsData;
+    const jobSkillsIds: number[] = jobSkills.map(jobSkill => jobSkill.skill_id);
     
-    const { data: job, error: jobError, status: jobStatus } = await jobSkillParser(jobGameData ?? jobResponse);
+    const { data: skills, error: skillsError, message: skillsMessage, status: skillsStatus} = await getItems('skills',jobSkillsIds);
 
-    if (jobError) return c.json({ message: jobError }, jobStatus);
+    if (skillsError) return c.json({ message: skillsMessage }, skillsStatus);
 
+    const { data: jobGames, error: jobGamesError, message: jobGamesMessage, status: jobGamesStatus } = await getItem('jobs_games', +id, 'job_id');
+
+    if (jobGamesError) return c.json({ message: jobGamesMessage}, jobGamesStatus);
+
+    const gamesOfJob: JobsGames[] = jobGames;
+    const jobGamesIds: number[] = gamesOfJob.map( gameJob => gameJob.game_id);
+
+    const { data: games, error: errorGames, message: messageGames, status: statusGames } = await getItems('games', jobGamesIds);
+
+    if (errorGames) return c.json({ message: messageGames },statusGames);
+
+    const job: JobResponse = {...jobResponse, skills, games }
+    
     return c.json({ data:job }, 200);
       
   });
@@ -38,42 +54,53 @@ export const JobsRoutes = (app: Hono) => {
     const { games, skills, ...rest } = body;
 
     const isValidBody = isValidJob(body);
-    
+
     if (!isValidBody) return c.json({ message: 'Body is not valid'}, 400);
 
-		const { data, status, message, error } = await addJob(rest);
-    
+    const { data, error, status } = await addItemToTable('jobs', rest);
+
     if (error) return c.json({ message: error }, status);
-    
-    const job:Job = data[0];
-    
+
+    const job: Job = data[0];
+
     if (games) {
-      const { error: jobGameError, status: jobGameStatus } = await addJobGame(games, job.id ?? 0);
-		
-      if (jobGameError) return c.json({ message: jobGameError }, jobGameStatus);
+      const { error: jobsGamesError, status: jobsGamesStatus } = await addRelation('jobs_games',games, job.id ?? 0);
+      if (jobsGamesError) return c.json({ message: jobsGamesError }, jobsGamesStatus);
     }
 
     if (skills) {
-      const { error: jobSkillError , status: jobSkillStatus } = await addJobSkill(skills, job.id ?? 0);
-
-      if (jobSkillError) return c.json({ message: jobSkillError }, jobSkillStatus);
+      const { error: jobsSkillsError, status: jobsSkillsStatus } = await addRelation('jobs_skills', skills, job.id ?? 0);
+      if (jobsSkillsError) return c.json({ message: jobsSkillsError }, jobsSkillsStatus);
     }
 
-    return c.json({ data, message }, status)
+    return c.json({ data, error: null, message: 'Job added successfully!!' }, status)
 	});
 
 	app.patch('/manager/jobs', async (c) => {
-    const body = await c.req.json();
+    const body: JobResponse = await c.req.json();
 
     const { skills, games, ...rest } = body;
+
+    const job: Job = rest;
 
     const isValidBody = isValidJob(body);
     
 		if (!isValidBody) return c.json({ message: 'Body is not valid'}, 400);
-    
-		const { data, error } = await updateJob(rest, games, skills);
-    
-		if (error) return c.json({ message: error }, 500);
+
+    const { data, error, status } = await updateTable('jobs', job);
+
+    if (error) return c.json({ message: error }, status);
+
+    if (games) {
+      const { error, status } = await updateRelationTable('jobs_games', job.id, games);
+
+      if (error) return c.json({ error }, status);
+    }
+
+    if (skills) {
+      const { error, status } = await updateRelationTable('jobs_skills', job.id, skills);
+      if (error) return c.json({ error }, status);
+    }
     
 		return c.json({ data, message: 'Job updated' }, 200);
 	});
@@ -81,7 +108,7 @@ export const JobsRoutes = (app: Hono) => {
 	app.delete('/manager/jobs/:id', async (c) => {
 		const id = c.req.param('id');
     
-    const { data, error } = await deleteJob(+id);
+    const { data, error } = await deleteItem('jobs','id',+id);
 
     if (error)
       return c.json({ message: error }, 400);

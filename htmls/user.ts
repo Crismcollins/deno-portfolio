@@ -1,4 +1,4 @@
-import { User } from "../Supabase/index.ts";
+import { User } from "../Neon/index.ts";
 
 export const UserHtml = (user: User) => {
   const editUserURL = '/manager/user'

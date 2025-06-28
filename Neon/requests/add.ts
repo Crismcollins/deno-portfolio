@@ -1,89 +1,75 @@
-import supabase, { Education, Job, Skill, User } from "../index.ts";
-import { Game } from "../types.ts";
+import { StatusCode } from "../../deps.ts";
+import sql from "../index.ts";
+import { Tables } from "../types.ts";
 
-export const addUser = async (user: User) => {
-  const { data, error, status } = await supabase
-    .from('users')
-    .insert(user);
+export const generateSqlInsert = (params: Record<string, unknown>) => {
+  const keys = Object.keys(params);
+  const values = Object.values(params);
 
-    if (error) return { error, message: error.message, status };
+  if (keys.length === 0) throw new Error('No params provided');
 
-    return { data, message: 'User added successfully!!', status};
+  const columnsSql = keys
+    .map((k) => sql.unsafe(k))
+    .reduce((acc, curr, i) => (i === 0 ? curr : sql`${acc}, ${curr}`));
+
+  const valuesSql = values
+    .map((v) => sql`${v}`)
+    .reduce((acc, curr, i) => (i === 0 ? curr : sql`${acc}, ${curr}`));
+
+  return { columnsSql, valuesSql };
+};
+
+export const addItemToTable = async (table: Tables, data:Record<string, unknown>) => {
+  try {
+    const { columnsSql, valuesSql } = generateSqlInsert(data);
+    console.log(columnsSql, valuesSql)
+    const result = await sql`
+      INSERT INTO ${sql.unsafe(table)} (${columnsSql})
+      VALUES (${valuesSql})
+      RETURNING*;
+    `;
+
+    return {
+      data: result,
+      error: null,
+      status: 200 as StatusCode,
+    };
+  } catch (error) {
+    return {
+      data: null,
+      error: error,
+      status: 500 as StatusCode,
+    };
+  }
 }
 
-export const addSkill = async (skill: Skill) => {
-  const { data, error, status } = await supabase
-    .from('skills')
-    .insert(skill);
-
-    if (error) return { data: null, message:error.message};
-
-    return { data, message: 'Skill added successfully!!', error, status};
-}
-
-export const addJob = async (job: Job) => {
-  const { data, error, status } = await supabase
-    .from('jobs')
-    .insert(job)
-    .select('*')
-
-    if (error) return { data: null, message: error.message, status};
-
-    return { data, message: 'Job added successfully!!', error, status };
-}
-
-export const addEducation = async (education: Education) => {
-  const { data, error, status } = await supabase
-    .from('educations')
-    .insert(education);
-
-    if (error) return { data: null, message:error.message, status };
-
-    return { data, message: 'Education added successfully!!', error, status };
-}
-
-export const addGame = async (game: Game) => {
-  const { data, error, status } = await supabase
-    .from('games')
-    .insert(game)
-    .select('id');
-
-    if (error) return { data: null, message:error.message, status };
-
-    return { data: data[0].id, message: 'Game added successfully!!', error, status };
-}
-
-export const addGameSkill = async (gameId: number, skillId: number) => {
-  const { data, error, status } = await supabase
-    .from('games_skills')
-    .insert({
-      game_id: gameId,
-      skill_id: skillId
-    });
-
-    if (error) return { data: null, message:error.message, status };
-
-    return { data, message: 'Game added successfully!!', error, status };
-}
-
-export const addJobGame = async (games: Game[], job_id: number) => {
-    const { data, error, status } = await supabase
-    .from('jobs_games')
-    .insert(games.map(game => ({ job_id, game_id: game.id })));
-
-    if (error) {
-      return { data: null, error, status };
+export const addRelation = async <T extends { id: number; }>(table: Tables, dataArray: T[], id: number) => {
+  try {
+    if (dataArray.length === 0) {
+      return { data: [], error: null, status: 200 as StatusCode };
     }
 
-  return { data, error: null, status };
+    const columns = tableColumnsMap[table] ?? '';
+    
+    const valuesSql = dataArray
+      .map((data) => sql`(${id}, ${data.id})`)
+      .reduce((acc, curr, i) => (i === 0 ? curr : sql`${acc}, ${curr}`));
+  
+    const result = await sql`
+      INSERT INTO ${sql.unsafe(table)} ${sql.unsafe(columns)}
+      VALUES ${valuesSql}
+      RETURNING *;
+    `;
+  
+    return { data: result, error: null, status: 200 as StatusCode };
+  } catch (error) {
+    console.log(error);
+    return { data: null, error, status: 500 as StatusCode };
+  }
 }
 
-export const addJobSkill = async (skills: Skill[], job_id: number) => {
-  const { data, error, status } = await supabase
-  .from('jobs_skills')
-  .insert(skills.map(skill => ({ job_id, skill_id: skill.id })));
-
-  if (error) return { data: null, error, status }
-
-  return { data, error, status }
-}
+const tableColumnsMap: Record<string, string> = {
+  jobs_games: '(job_id, game_id)',
+  games_skills: '(game_id, skill_id)',
+  jobs_skills: '(job_id, skill_id)',
+};

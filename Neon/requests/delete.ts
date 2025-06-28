@@ -1,56 +1,44 @@
-import supabase, { User } from "../index.ts";
 
-export const deleteUser = async (user: User) => {
-  const { data, error } = await supabase
-    .from('users')
-    .delete()
-    .eq('id', user.id)
+import { StatusCode } from "../../deps.ts";
+import sql from "../index.ts";
+import { Tables } from "../types.ts";
 
-    if (error) return { data: null, message: error.message };
+type DeleteResult = {
+  data: unknown | null;
+  message?: string;
+  error?: unknown | null;
+  status: StatusCode;
+};
 
-    return { data, message: 'User deleted successfully!!'};
-}
+/**
+ * Borra un registro de una tabla por una columna y valor.
+ * @param table Nombre de la tabla
+ * @param column Nombre de la columna para el filtro (ej: 'id')
+ * @param value Valor que debe coincidir para borrar
+ */
+export async function deleteItem<T = unknown>(
+  table: Tables,
+  column: string,
+  value: T
+): Promise<DeleteResult> {
+  try {
+    const data = await sql`
+      DELETE FROM ${sql.unsafe(table)}
+      WHERE ${sql.unsafe(column)} = ${value}
+    `;
 
-export const deleteSkill = async (id: number) => {
-  const { data, error, status } = await supabase
-    .from('skills')
-    .delete()
-    .eq('id', id)
-
-    if (error) return { data: null, message: error.message, status };
-
-    return { data, error, status };
-}
-
-export const deleteJob = async (id: number) => {
-  const { data, error, status } = await supabase
-    .from('jobs')
-    .delete()
-    .eq('id', id)
-
-    if (error) return { data: null, message: error.message, status };
-
-    return { data, error, status };
-}
-
-export const deleteEducation = async (id: number) => {
-  const { data, error, status } = await supabase
-    .from('educations')
-    .delete()
-    .eq('id', id)
-
-    if (error) return { data: null, message: error.message, status };
-
-    return { data, error, status };
-}
-
-export const deleteGame = async (id: number) => {
-  const { data, error, status } = await supabase
-    .from('games')
-    .delete()
-    .eq('id', id)
-
-    if (error) return { data: null, message: error.message, status };
-
-    return { data, error, status };
+    return {
+      data,
+      message: 'Deleted successfully',
+      error: null,
+      status: 200,
+    };
+  } catch (error) {
+    return {
+      data: null,
+      message: (error as Error).message,
+      error,
+      status: error.code ?? 500,
+    };
+  }
 }

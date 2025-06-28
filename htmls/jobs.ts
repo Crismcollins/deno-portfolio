@@ -1,4 +1,4 @@
-import { Job, Language } from "../Supabase/index.ts";
+import { Job, Language } from "../Neon/index.ts";
 
 export const jobsHtml = (jobs: Job[], language?: Language) => {
   const html = `

@@ -1,5 +1,6 @@
 export type Tables = 'users' | 'skills' | 'jobs' | 'educations' | 'games' | 'games_skills' | 'jobs_skills' | 'jobs_games';
 
+export type RelationalTables = 'games_skills' | 'jobs_skills' | 'jobs_games';
 export type Language = 'en' | 'es';
 
 export type HttpMethod = 'PATCH' | 'PUT' | 'DELETE' | 'GET' | 'POST';
@@ -16,7 +17,7 @@ export type User = {
   location: string;
   phone_number: string;
   about_me: string;
-  image: CustomFileResponse;
+  image: string;
   study_title: string;
   language: Language;
 }
@@ -35,7 +36,7 @@ export type UserResponse = {
 }
 
 export type JobResponse = {
-  id?: number;
+  id: number;
   user_id: number;
   title: string;
   description: string;
@@ -52,7 +53,7 @@ export type JobResponse = {
 }
 
 export type Job = {
-  id?: number;
+  id: number;
   user_id: number;
   title: string;
   description: string;
@@ -63,13 +64,11 @@ export type Job = {
   company_description?: string;
   location?: string;
   contact?: string;
-  // games?: Game[];
-  // skills?: Skill[];
-  logo: CustomFileResponse;
+  logo: string;
 }
 
 export type Skill = {
-  id?: number;
+  id: number;
   user_id: number;
   name: string;
   type: SkillType;
@@ -79,7 +78,7 @@ export type Skill = {
 export type SkillType = 'hard' | 'soft';
 
 export type EducationResponse = {
-  id?: number;
+  id: number;
   user_id: number;
   title: string;
   institution: string;
@@ -91,21 +90,8 @@ export type EducationResponse = {
   logo: string;
 }
 
-export type EducationManager = {
-  id?: number;
-  user_id: number;
-  title: string;
-  institution: string;
-  description: string;
-  start_date: Date;
-  end_date: Date;
-  language: Language;
-  location?: string;
-  logo: CustomFileResponse;
-}
-
 export type Education = {
-  id?: number;
+  id: number;
   user_id: number;
   title: string;
   institution: string;
@@ -114,20 +100,21 @@ export type Education = {
   end_date: string;
   language: Language;
   location?: string;
-  logo: CustomFileResponse;
+  logo: string;
 }
 
 export type Game = {
-  id?: number;
+  id: number;
   user_id: number;
   name: string;
   description: string;
   link: string;
-  image: CustomFileResponse;
+  image: string;
   video?: string;
-  background: CustomFileResponse;
+  background: string;
   duration: string;
   language: Language;
+  date_release: string;
 }
 
 export type GameResponse = {
@@ -140,22 +127,9 @@ export type GameResponse = {
   background: string;
   duration: string;
   language: Language;
+  date_release: string;
+  skills: Skill[];
 }
-
-export type SupabaseError = {
-  statusCode: string;
-  error: string;
-  message: string;
-} | null;
-
-export type CustomFileResponse = {
-  id: string;
-  name: string;
-  url: string;
-  type: FileType;
-}
-
-export type FileType = 'video' | 'image';
 
 export type GamesSkills = {
   id: number;

@@ -1,20 +1,12 @@
-import {
-  GoogleDriveRoutes,
-  FilesRoutes,
-  TokenRoutes
-} from "./Routes/index.ts";
-import { setAppHono } from "./GlobalStates/tokenState.ts";
-import { Hono } from "https://deno.land/x/hono@v3.4.1/mod.ts";
-import { cors } from "https://deno.land/x/hono@v4.3.11/middleware.ts";
-// import { UploadModels } from "./db/index.ts";
+import { initializeHono } from "./GlobalStates/initializer.ts";
 import { ManagerRoutes } from "./Routes/manager.ts";
 import { ClientRoutes } from "./Routes/client.ts";
 import { redirectUrl } from "./Routes/middlewares.ts"
 import { executeAllMigrations } from "./db/Migrations/index.ts";
 import { UploadModels } from "./db/index.ts";
+import { cors } from "./deps.ts";
 
-const app = new Hono();
-setAppHono(app);
+const app = initializeHono();
 
 app.use('*', cors({
   origin: '*',
@@ -44,9 +36,6 @@ app.get("/models/migrations", async (c) => {
   return c.html(`<p>MIGRATION STATUS: ${error ?? 'Migrations executed successfully!!'}</p>`)
 })
 
-TokenRoutes(app);
-GoogleDriveRoutes(app);
-FilesRoutes(app);
 ClientRoutes(app);
 ManagerRoutes(app);
 

@@ -1,4 +1,5 @@
-import { Context, MiddlewareHandler, Next } from "https://deno.land/x/hono@v3.4.1/mod.ts";
+import { Context, MiddlewareHandler, Next } from "../deps.ts";
+
 
 export const validateLanguage: MiddlewareHandler = async (c, next) => {
   const language = c.req.param('language');

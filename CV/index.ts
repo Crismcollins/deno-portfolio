@@ -1,4 +1,4 @@
-import { Language } from "../Supabase/types.ts";
+import { Language } from "../Neon/types.ts";
 import createHeader from "./header/header.ts";
 import renderPersonalData from "./personalData/personalData.ts";
 

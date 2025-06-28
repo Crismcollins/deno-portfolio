@@ -1,76 +1,91 @@
-import supabase, { Language, Tables } from "../index.ts";
-import { GamesSkills, JobsGames, JobsSkills } from "../types.ts";
+import { StatusCode } from "../../deps.ts";
+import sql, { Language, Tables } from "../index.ts";
 
 export const getTable = async (table: Tables, language?: Language) => {
-  const query = supabase
-    .from(table)
-    .select()
-    .order('id', { ascending: true });
-
-  if (language) {
-    query.eq('language', language);
+  try {
+    const query = language ? await sql`
+    SELECT * FROM ${sql.unsafe(table)}
+    WHERE language = ${language}
+  ` : await sql`SELECT * FROM ${sql.unsafe(table)}`;
+    
+    return {
+      data: query,
+      status: 200 as StatusCode,
+      message: 'OK',
+      error: null,
+    };
+  } catch (error) {
+    return {
+      data: [],
+      status: 500,
+      message: 'Error',
+      error: error.message,
+    };
   }
-
-  const response = await query;
-
-  const { data, status, statusText, error } = response;
-
-  return { data, status, message: statusText, error };
 };
 
-export const getItem = async (table: Tables, id: number) => {
-  const query = supabase
-    .from(table)
-    .select()
-    .eq('id', id);
+export const getItem = async (table: Tables, id: number, customLabelId: string = 'id') => {
+  try {
+    const data = await sql`
+      SELECT * FROM ${sql.unsafe(table)}
+      WHERE ${sql.unsafe(customLabelId)} = ${id}
+    `;
 
-  const response = await query;
+    return {
+      data,
+      status: 200 as StatusCode,
+      message: 'OK',
+      error: null,
+    };
+  } catch (error) {
+    return {
+      data: [],
+      status: 500 as StatusCode,
+      message: 'Error',
+      error: error.message,
+    };
+  }
+};
 
-  const { data, status, statusText, error } = response;
+export const getItems = async (
+  table: Tables,
+  ids: number[],
+  customLabelId: string = 'id'
+) => {
+  try {
+    const data = await sql`
+      SELECT * FROM ${sql.unsafe(table)}
+      WHERE ${sql.unsafe(customLabelId)} = ANY(${sql`${ids}`})
+    `;
 
-  return { data, status, message: statusText, error };
-}
+    return {
+      data,
+      status: 200 as StatusCode,
+      message: 'OK',
+      error: null,
+    };
+  } catch (error) {
+    return {
+      data: [],
+      status: 500 as StatusCode,
+      message: 'Error',
+      error: error.message,
+    };
+  }
+};
 
-export const getCrisUser = async (language: Language = 'en') => {
-  const { data, error } = await supabase
-    .from('users')
-    .select()
-    .eq('id', language === 'es' ? 1 : 2)
 
-  if (error) return error.message;
-
-  return data;
-}
-
-export const getGameSkillById = async (gameId: number) => {
-  const { data, error } = await supabase
-    .from('games_skills')
-    .select()
-    .eq('game_id', gameId);
-
-  if (error) return { data: null, message: error.message, status: error.code };
-
-  return { data: data as GamesSkills[], message: 'Game skills got successfully!!', error, status: 200 };
-}
-
-export const getJobGameById = async (jobId: number) => {
-  const { data, error } = await supabase
-    .from('jobs_games')
-    .select()
-    .eq('job_id', jobId);
-
-  if (error) return { data: null, message: error.message, status: error.code }
-
-  return { data: data as JobsGames[], message: null, error, status: 200 }
-}
-
-export const getJobSkillById = async (jobId: number) => {
-  const { data, error } = await supabase
-    .from('jobs_skills')
-    .select()
-    .eq('job_id', jobId);
-
-  if (error) return { data: null, message: error.message, status: error.code }
-
-  return { data: data as JobsSkills[], message: null, error, status: 200 }
-}
+export const getMyUser = async (language: Language = 'en') => {
+  try {
+    const id = language === 'es' ? 1 : 2;
+    
+    const data = await sql`
+      SELECT * FROM users
+      WHERE id = ${id}
+    `;
+    
+    return data;
+  } catch (error) {
+    return error.message;
+  }
+};

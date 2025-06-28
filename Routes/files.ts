@@ -1,7 +1,6 @@
-import { Hono } from "https://deno.land/x/hono@v3.4.1/mod.ts";
-import { getFileByName, getFileContentById } from "../GoogleDrive/getMethods.ts";
+import { HonoType } from "../deps.ts";
 
-export function FilesRoutes(app: Hono) {
+export function FilesRoutes(app: HonoType) {
 
   app.get("/generate-cv", async (c) => {
     const language = c.req.query('language') || 'es';

@@ -1,164 +1,134 @@
-import supabase, { Education, Job, Skill, User, Game } from "../index.ts";
-import { JobsGames, JobsSkills } from "../types.ts";
-import { addJobGame } from "./add.ts";
+import { StatusCode } from "../../deps.ts";
+import sql, { User } from "../index.ts";
+import { RelationalTables, Tables } from "../types.ts";
+
+const tableColumnsMap: Record<RelationalTables, { mainId: string; relatedId: string }> = {
+  games_skills: { mainId: 'game_id', relatedId: 'skill_id' },
+  jobs_skills: { mainId: 'job_id', relatedId: 'skill_id' },
+  jobs_games:  { mainId: 'job_id', relatedId: 'game_id' },
+};
+
+export const updateTable = async <T extends { id: number }>(table: Tables, data: T) => {
+  try {
+    const { id, ...rest } = data;
+
+    const updateFragments = Object.entries(rest).map(
+      ([key, value]) => sql`${sql.unsafe(key)} = ${value}`
+    );
+
+    const updateSql = updateFragments.reduce((acc, curr, i) =>
+      i === 0 ? curr : sql`${acc}, ${curr}`
+    );
+
+    const newData = await sql`
+      UPDATE ${sql.unsafe(table)}
+      SET ${updateSql}
+      WHERE id = ${id}
+      RETURNING *;
+    `;
+
+    return {
+      data: newData,
+      error: null,
+      status: 200 as const,
+    };
+  } catch (error) {
+    return {
+      data: null,
+      error,
+      status: 500 as const,
+    };
+  }
+};
+
+
+export const updateRelationTable = async <T extends { id: number }>(
+  table: RelationalTables,
+  mainId: number,
+  dataArray: T[]
+) => {
+  try {
+    const { mainId: mainColumn, relatedId } = tableColumnsMap[table];
+
+    const newIds = dataArray.map(item => item.id);
+
+    // 1. Obtener relaciones actuales
+    const currentRelations: Array<{ [key: string]: number }> = await sql`
+      SELECT ${sql.unsafe(relatedId)} FROM ${sql.unsafe(table)}
+      WHERE ${sql.unsafe(mainColumn)} = ${mainId}
+    `;
+
+    const currentIds = currentRelations.map((row: Record<string, number>) => row[relatedId]);
+
+    // 2. Calcular qué agregar y qué eliminar
+    const toAdd = newIds.filter(id => !currentIds.includes(id));
+    const toRemove = currentIds.filter((id: number) => !newIds.includes(id));
+
+    // 3. Eliminar relaciones no deseadas
+    if (toRemove.length > 0) {
+      const valuePlaceholders = toRemove
+        .map((id: number) => sql`${id}`)
+        .reduce((acc, curr, i: number) => (i === 0 ? curr : sql`${acc}, ${curr}`));
+    
+      await sql`
+        DELETE FROM ${sql.unsafe(table)}
+        WHERE ${sql.unsafe(mainColumn)} = ${mainId}
+        AND ${sql.unsafe(relatedId)} IN (${valuePlaceholders})
+      `;
+    }
+
+    // 4. Insertar nuevas relaciones
+    if (toAdd.length > 0) {
+      const values = toAdd
+        .map(id => sql`(${mainId}, ${id})`)
+        .reduce((acc, curr, i) => i === 0 ? curr : sql`${acc}, ${curr}`);
+
+      await sql`
+        INSERT INTO ${sql.unsafe(table)} (${sql.unsafe(mainColumn)}, ${sql.unsafe(relatedId)})
+        VALUES ${values}
+      `;
+    }
+
+    return {
+      status: 200 as StatusCode,
+      error: null,
+    };
+  } catch (error) {
+    console.error(error);
+    return {
+      status: 500 as StatusCode,
+      error,
+    };
+  }
+};
+
 
 export const updateUser = async (user: User) => {
-  const { data, error, status } = await supabase
-    .from('users')
-    .update(user)
-    .eq('id', user.id)
+  try {
+    const { id, ...rest} = user;
 
-  return { data, error, status };
-}
+    const updates = Object.entries(rest).map(
+      ([key, value]) => `${key} = '${value}'`
+    )
 
-export const updateSkill = async (skill: Skill) => {
-  const { data, error, status } = await supabase
-    .from('skills')
-    .update(skill)
-    .eq('id', skill.id)
-
-  if (error) return { data: null, message: error.message };
-
-  return { data, error, status };
-}
-
-export const updateJob = async (job: Job, games: Game[], skills: Skill[]) => {
-
-  // ADD GAMES
-  const { data: jobData, error: jobError, status: jobStatus } = await supabase
-    .from('jobs')
-    .update(job)
-    .eq('id', job.id)
-
-  if (jobError) return { data: null, error: jobError, status: jobStatus };
-
-  const { data: jobGamesData, error: jobGamesError, status: jobGamesStatus } = await supabase
-    .from('jobs_games')
-    .select('game_id')
-    .eq('job_id', job.id)
-
-  if (jobGamesError) return { data: null, error: jobGamesError, status: jobGamesStatus }
-  
-  const jobGames: JobsGames[] = jobGamesData;
-  
-  const currentGamesIds = jobGames.map(jobGame => jobGame.game_id);
-  
-  const gamesToRemove = currentGamesIds.filter((id: number) => !games.some(game => game.id === id));
-  
-  if (gamesToRemove.length > 0) {
-    const { error: removeGameError } = await supabase
-      .from('jobs_games')
-      .delete()
-      .in('game_id', gamesToRemove)
-      .eq('job_id', job.id)
-
-    if (removeGameError)
-      return { data: null, error: removeGameError, status: removeGameError.code };
+    const data: User = await sql`
+      UPDATE users
+      SET ${sql.unsafe(updates)}
+      WHERE id = ${id}
+      RETURNING *;
+    `;
+    
+    return {
+      data: data,
+      error: null,
+      status: 200,
+    };
+  } catch (error) {
+    
+    return {
+      data: null,
+      error,
+      status: (error.code ?? 500) as StatusCode,
+    };
   }
-
-  const newGamesIds = games.map(game => game.id)
-  const gamesToAdd = newGamesIds.filter(id => !currentGamesIds.includes(id!));
-
-  if (gamesToAdd && gamesToAdd?.length > 0) {
-    const { error: addError } = await addJobGame(games, job.id ?? 0);
-
-    if (addError) return { data: null, error: addError, status: addError.code }
-  }
-
-  // ADD SKILLS
-
-  const { data: currentSkills, error: skillsError, statusText: skillsStatusText, status: skillsStatus } = await supabase
-  .from('jobs_skills')
-  .select('skill_id')
-  .eq('job_id', job.id);
-
-if (skillsError) return { data: null, error: skillsError, statusText: skillsStatusText, status: skillsStatus };
-
-const currentSkillsIds = currentSkills.map((skill: JobsSkills) => skill.skill_id);
-
-const skillsToRemove = currentSkillsIds.filter( (id: number) => !skills.some(skill => skill.id === id));
-
-if (skillsToRemove.length > 0) {
-  const { error: removeError } = await supabase
-    .from('jobs_skills')
-    .delete()
-    .in('skill_id', skillsToRemove)
-    .eq('job_id', job.id)
-
-  if (removeError) {
-    return { data: null, error: removeError, status: removeError.code };
-  }
-}
-
-const newSkillsIds = skills.map(skill => skill.id);
-const skillsToAdd = newSkillsIds.filter(id => !currentSkillsIds.includes(id));
-
-if (skillsToAdd.length > 0) {
-  const { error: addError } = await supabase
-    .from('jobs_skills')
-    .insert(skillsToAdd.map(skill_id => ({ job_id: job.id, skill_id })));
-
-  if (addError) {
-    return { data: null, error: addError, status: addError.code };
-  }
-}
-
-  return { data: jobData, error: null, status: jobStatus };
-
-}
-
-export const updateEducation = async (education: Education) => {
-  const { data, error, status } = await supabase
-    .from('educations')
-    .update(education)
-    .eq('id', education.id)
-
-  return { data, error, status };
-}
-
-export const updateGame = async (game: Game, skills: Skill[]) => {
-  const { data: gameData, error: gameError, statusText: gameStatusText, status: gameStatus } = await supabase
-    .from('games')
-    .update(game)
-    .eq('id', game.id);
-
-  if (gameError) return { data: null, error: gameError, statusText: gameStatusText, status: gameStatus }
-
-  const { data: currentSkills, error: skillsError, statusText: skillsStatusText, status: skillsStatus } = await supabase
-    .from('games_skills')
-    .select('skill_id')
-    .eq('game_id', game.id);
-
-  if (skillsError) return { data: null, error: skillsError, statusText: skillsStatusText, status: skillsStatus };
-
-  const currentSkillsIds = currentSkills.map(skill => skill.skill_id);
-
-  const skillsToRemove = currentSkillsIds.filter(id => !skills.some(skill => skill.id === id));
-
-  if (skillsToRemove.length > 0) {
-    const { error: removeError } = await supabase
-      .from('games_skills')
-      .delete()
-      .in('skill_id', skillsToRemove)
-      .eq('game_id', game.id)
-
-    if (removeError) {
-      return { data: null, error: removeError, status: removeError.code };
-    }
-  }
-
-  const newSkillsIds = skills.map(skill => skill.id);
-  const skillsToAdd = newSkillsIds.filter(id => !currentSkillsIds.includes(id));
-
-  if (skillsToAdd.length > 0) {
-    const { error: addError } = await supabase
-      .from('games_skills')
-      .insert(skillsToAdd.map(skill_id => ({ game_id: game.id, skill_id })));
-
-    if (addError) {
-      return { data: null, error: addError, status: addError.code };
-    }
-  }
-
-  return { data: gameData, error: null, status: gameStatus };
 }

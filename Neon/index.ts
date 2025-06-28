@@ -1,9 +1,10 @@
 export type { Education, Job, Language, Skill, Tables, User, Game } from "./types.ts";
-import { createClient } from "../deps.ts";
 
-const url = Deno.env.get('SUPABASE_URL') ?? '';
-const key = Deno.env.get('SUPABASE_KEY') ?? '';
+import { neon } from "../deps.ts";
+import { requireEnv } from "../helpers.ts";
 
-const supabase = createClient(url, key);
+const url = requireEnv('DATABASE_STRING_CONNECTION');
 
-export default supabase;
+const sql = neon(url);
+
+export default sql;

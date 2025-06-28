@@ -1,11 +1,11 @@
-import { Hono } from "https://deno.land/x/hono@v3.4.1/mod.ts";
-import { getItem, getTable } from "../../../Supabase/requests/get.ts";
+import { getItem, getTable } from "../../../Neon/requests/get.ts";
 import { isValidSkill } from "../../../helpers.ts";
-import { addSkill } from "../../../Supabase/requests/add.ts";
-import { updateSkill } from "../../../Supabase/requests/update.ts";
-import { deleteSkill } from "../../../Supabase/requests/delete.ts";
+import { addItemToTable } from "../../../Neon/requests/add.ts";
+import { updateTable } from "../../../Neon/requests/update.ts";
+import { deleteItem } from "../../../Neon/requests/delete.ts";
+import { HonoType } from "../../../deps.ts";
 
-export const SkillsRoutes = (app:Hono) => {
+export const SkillsRoutes = (app:HonoType) => {
   app.get('/manager/skills', async (c) => {
 		const { data, error} = await getTable('skills');
 
@@ -37,7 +37,7 @@ export const SkillsRoutes = (app:Hono) => {
     
     if (!isValidBody) return c.json({ message: 'Body is not valid'}, 400);
 
-		const { data, error, status } = await addSkill(body);
+		const { data, error, status } = await addItemToTable('skills',body);
 		
 		if (error) return c.json({ message: error }, status);
 		
@@ -50,7 +50,7 @@ export const SkillsRoutes = (app:Hono) => {
 		
 		if (!isValidBody) return c.json({ message: 'Body is not valid'}, 400);
 
-		const { data, error, status } = await updateSkill(body);
+		const { data, error, status } = await updateTable('skills',body);
 
 		if (error) return c.json({ message: error }, status);
 
@@ -59,7 +59,7 @@ export const SkillsRoutes = (app:Hono) => {
 	app.delete('/manager/skills/:id', async (c) => {
 		const id = c.req.param('id');
     
-    const { data, error, status } = await deleteSkill(+id);
+		const { data, error, status } = await deleteItem('skills','id',+id);
 
     if (error)
       return c.json({ message: error }, status);

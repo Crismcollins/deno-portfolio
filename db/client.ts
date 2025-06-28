@@ -1,4 +1,4 @@
-import { Client } from "https://deno.land/x/postgres@v0.14.2/mod.ts";
+import { Client } from "../deps.ts";
 
 const client = new Client({
   database: Deno.env.get('DATABASE_NAME'),

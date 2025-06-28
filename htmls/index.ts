@@ -1,9 +1,9 @@
-import { Context, Env } from "https://deno.land/x/hono@v3.4.1/mod.ts";
 import { jobsHtml } from "./jobs.ts";
 import { HtmlData } from "./types.ts";
 import { UserHtml } from "./user.ts";
 import { CreateUserHtml } from "./create-user.ts";
-import { Language } from "../Supabase/index.ts";
+import { Language } from "../Neon/index.ts";
+import { Context, Env } from "../deps.ts";
 
 const cssContent = await Deno.readTextFile("htmls/style.css");
 

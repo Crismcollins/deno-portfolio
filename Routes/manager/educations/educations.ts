@@ -1,17 +1,17 @@
-import { Hono } from "https://deno.land/x/hono@v3.4.1/mod.ts";
-import { getItem, getTable } from "../../../Supabase/requests/get.ts";
-import { educationResponseParser, isValidEducation } from "../../../helpers.ts";
-import { addEducation } from "../../../Supabase/requests/add.ts";
-import { updateEducation } from "../../../Supabase/requests/update.ts";
-import { deleteEducation } from "../../../Supabase/requests/delete.ts";
-import { CustomFileResponse, Education, EducationManager, EducationResponse } from "../../../Supabase/types.ts";
+import { getItem, getTable } from "../../../Neon/requests/get.ts";
+import { isValidEducation } from "../../../helpers.ts";
+import { addItemToTable } from "../../../Neon/requests/add.ts";
+import { updateTable } from "../../../Neon/requests/update.ts";
+import { deleteItem } from "../../../Neon/requests/delete.ts";
+import { EducationResponse, Education } from "../../../Neon/types.ts";
+import { HonoType, StatusCode } from "../../../deps.ts";
 
-export const EducationsRoutes = (app:Hono) => {
+export const EducationsRoutes = (app:HonoType) => {
   app.get('/manager/educations', async (c) => {
 		const { data, error, status } = await getTable('educations');
 		if (error) return c.json({ message: error.message }, 400);
-		
-		return c.json({ data }, status);
+		console.log(data)
+		return c.json({ data }, status as StatusCode);
 	});
 	app.get('/manager/educations/:id', async (c) => {
 		const id = c.req.param('id');
@@ -22,14 +22,8 @@ export const EducationsRoutes = (app:Hono) => {
 		if (!data) return c.json({ data: {} }, 200);
 
 		const educationResponse: EducationResponse = data[0];
-		// const education: Education = educationResponseParser(educationResponse);
-		const education: EducationManager = {
-			...educationResponse,
-			logo: JSON.parse(educationResponse.logo)
-		}
-		
 
-		return c.json({ data: education }, 200);
+		return c.json({ data: educationResponse }, 200);
 	});
 
 	app.post('/manager/educations', async (c) => {
@@ -38,7 +32,7 @@ export const EducationsRoutes = (app:Hono) => {
 
 		if (!isValidBody) return c.json({ message: 'Body is not valid'}, 400);
 
-		const { data, error, status } = await addEducation(body);
+		const { data, error, status } = await addItemToTable('educations', body);
 
 		if (error) return c.json({ message: error }, status);
 
@@ -50,7 +44,9 @@ export const EducationsRoutes = (app:Hono) => {
 
 		if (!isValidBody) return c.json({ message: 'Body is not valid'}, 400);
 
-		const { data, error, status } = await updateEducation(body);
+		const education: Education = body;
+
+		const { data, error, status } = await updateTable('educations', education);
 
 		if (error) return c.json({ message: error }, status);
 
@@ -60,7 +56,7 @@ export const EducationsRoutes = (app:Hono) => {
 	app.delete('/manager/educations/:id', async (c) => {
 		const id = c.req.param('id');
     
-    const { data, error, status } = await deleteEducation(+id);
+    const { data, error, status } = await deleteItem('educations','id',+id);
 
     if (error)
       return c.json({ message: error }, status);
