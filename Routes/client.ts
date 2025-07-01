@@ -1,6 +1,8 @@
 import { EducationResponse, GameResponse, Job, JobResponse, Language, Skill, UserResponse, JobsSkills, JobsGames } from "../Neon/types.ts";
 import { getItem, getItems, getTable } from "../Neon/requests/get.ts";
 import { HonoType } from "../deps.ts";
+import { convertTimeStampToYYMM, sortJobs } from "../helpers.ts";
+import { Education } from "../Neon/types.ts";
 
 export function ClientRoutes(app: HonoType) {
 
@@ -43,8 +45,10 @@ export function ClientRoutes(app: HonoType) {
     
     const jobsResponse: Job[] = data.data;
 
+    const jobsSorted: Job[] = sortJobs(jobsResponse);
+
     const jobs: JobResponse[] = await Promise.all(
-      jobsResponse.map(async (jobResponse) => {
+      jobsSorted.map(async (jobResponse) => {
         const { data, error } = await getItem('jobs_skills', jobResponse.id, 'job_id');
         
         if (error) throw new Error(error);
@@ -68,12 +72,18 @@ export function ClientRoutes(app: HonoType) {
         const { data: games, error: gamesError } = await getItems('games', jobsGamesIds)
 
         if (gamesError) throw new Error(gamesError);
+
+        const jobs: Job = { 
+          ...jobResponse,
+          start_date: convertTimeStampToYYMM(jobResponse.start_date),
+          end_date: jobResponse.end_date ? convertTimeStampToYYMM(jobResponse.end_date) : language === 'en' ? 'Present' : 'Presente',
+        }
   
-        return { ...jobResponse, skills, games };
+        return { ...jobs, skills, games };
       })
     )
 
-    return c.json({ data: jobs });
+    return c.json({ data: jobs }, 200);
   });
 
   app.get("/client/educations/:language?", async (c) => {
@@ -82,9 +92,11 @@ export function ClientRoutes(app: HonoType) {
 
     if (!data.data) return c.json({ data: [] }, 200);
 
-    const educationsResponse: EducationResponse[] = data.data;
+    const educationsResponse: Education[] = data.data;
 
-    return c.json({ data: educationsResponse }, 200);
+    const educations: EducationResponse[] = educationsResponse.map(education => ( { ...education, start_date: convertTimeStampToYYMM(education.start_date) , end_date: convertTimeStampToYYMM(education.end_date) }))
+
+    return c.json({ data: educations }, 200);
   });
 
   app.get("/client/games/:language", async (c) => {
@@ -98,8 +110,6 @@ export function ClientRoutes(app: HonoType) {
     if (!data) return c.json({ message: 'No games' }, 204);
 
     const games: GameResponse[] = data;
-
-    // const gamesParsed: Game[] = gameListResponseParser(games);
 
     return c.json({ data: games }, 200);
   });

@@ -1,6 +1,6 @@
 
 import { Education, Job, Skill, User } from "./Neon/index.ts";
-import { Game } from "./Neon/types.ts";
+import { Game, Language } from "./Neon/types.ts";
 
 export const isValidJob = (obj: Job): obj is Job => {
   return (
@@ -10,13 +10,11 @@ export const isValidJob = (obj: Job): obj is Job => {
     'company' in obj &&
     'language' in obj &&
     'start_date' in obj &&
-    'end_date' in obj &&
     'description' in obj &&
     typeof obj.title === 'string' &&
     typeof obj.company === 'string' &&
     typeof obj.language === 'string' &&
     typeof obj.start_date === 'string' &&
-    typeof obj.end_date === 'string' &&
     typeof obj.description === 'string'
   );
 };
@@ -113,4 +111,25 @@ export function requireEnv(name: string | undefined): string {
   const value = Deno.env.get(name);
   if (!value) throw new Error(`Missing env var: ${name}`);
   return value;
+}
+
+export function convertTimeStampToYYMM(dateStr: string, language: Language = 'en') {
+  const date = new Date(dateStr);
+  const yymm = language === 'en' ? 
+    `${String(date.getFullYear())}/${String(date.getMonth() + 1).padStart(2, '0')}` : 
+    `${String(date.getMonth() + 1).padStart(2, '0')}/${String(date.getFullYear())}`;
+  return yymm;
+}
+
+export function sortJobs(jobsList: Job[]): Job[] {
+  return [...jobsList].sort((job1, job2) => {
+    const date1 = job1.end_date ? new Date(job1.end_date).getTime() : null;
+    const date2 = job2.end_date ? new Date(job2.end_date).getTime() : null;
+
+    if (date1 === null && date2 === null) return 0;
+    if (date1 === null) return -1; // job1 sin fecha => va primero
+    if (date2 === null) return 1;  // job2 sin fecha => va primero
+
+    return date2 - date1; // más reciente primero
+  });
 }

@@ -58,7 +58,7 @@ export const JobsRoutes = (app: HonoType) => {
     if (!isValidBody) return c.json({ message: 'Body is not valid'}, 400);
 
     const { data, error, status } = await addItemToTable('jobs', rest);
-
+    
     if (error) return c.json({ message: error }, status);
 
     const job: Job = data[0];

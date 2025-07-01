@@ -83,8 +83,8 @@ export type EducationResponse = {
   title: string;
   institution: string;
   description: string;
-  start_date: Date;
-  end_date: Date;
+  start_date: string;
+  end_date: string;
   language: Language;
   location?: string;
   logo: string;
