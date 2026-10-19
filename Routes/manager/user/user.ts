@@ -39,11 +39,11 @@ export const UserRoutes = (app: HonoType) => {
 
     if (!isValidBody) return c.json({ message: 'Body is not valid'}, 400);
     
-    const { error: errorUser, status } = await updateUser(body);
+    const { error: errorUser, status, data } = await updateUser(body);
     
     if (errorUser) return c.json({ errorUser }, status);
 
-    return c.json({ message: 'User updated successfully!!' }, 200);
+    return c.json({ data, message: 'User updated successfully!!' }, 200);
 
   });
 }

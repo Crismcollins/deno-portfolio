@@ -12,7 +12,7 @@ app.use('*', cors({
   origin: '*',
   allowHeaders: ['Content-Type', 'Authorization'],
   allowMethods: ['GET', 'POST', 'PATCH', 'DELETE', 'OPTIONS'],
-  exposeHeaders: ['Content-Length', 'X-Kuma-Revision'],
+  exposeHeaders: ['Content-Length', 'X-Kuma-Revision', 'Access-Control-Expose-Headers'],
   maxAge: 600,
   credentials: false,
 }));

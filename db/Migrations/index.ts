@@ -6,7 +6,7 @@ import { openConnection, closeConnection, executeQuery } from "../index.ts";
 // const MIGRATIONS_PATH = "./Supabase/migrations";
 
 // export const executeAllMigrations = async () => {
-  
+
 //   let errorMigration = null;
 //   const migrationFolderPath = MIGRATIONS_PATH;
 //   const migrationsFolder = Deno.readDir(migrationFolderPath);
@@ -22,7 +22,7 @@ import { openConnection, closeConnection, executeQuery } from "../index.ts";
 
 //   for (const file of files) {
 //     const fnName = file.name.replace('.sql', '').replace(/^\d+_/, "");
-    
+
 //     const { error } = await supabase.rpc(fnName);
 
 //     if (error) {
@@ -43,7 +43,7 @@ import { openConnection, closeConnection, executeQuery } from "../index.ts";
 
 
 
-const MIGRATIONS_PATH = "./Supabase/migrations";
+const MIGRATIONS_PATH = "./Neon/migrations";
 
 export const executeAllMigrations = async () => {
   let errorMigration = null;
@@ -67,7 +67,7 @@ export const executeAllMigrations = async () => {
     for (const file of files) {
       const filePath = `${migrationFolderPath}/${file.name}`;
       const sql = await Deno.readTextFile(filePath);
-      
+
       try {
         await executeQuery(sql);
         console.log(`OK Migration ${file.name} executed successfully!!`);

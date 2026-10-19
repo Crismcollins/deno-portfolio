@@ -4,6 +4,7 @@ import { SkillsRoutes } from "./manager/skills/skills.ts";
 import { EducationsRoutes } from "./manager/educations/educations.ts";
 import { GamesRoutes } from "./manager/games/games.ts";
 import { StorageRoutes } from "./manager/storage/storage.ts";
+import { CvConfigRoutes } from "./manager/cv-config/cv-config.ts";
 import { HonoType } from "../deps.ts";
 
 export function ManagerRoutes(app: HonoType) {
@@ -13,4 +14,5 @@ export function ManagerRoutes(app: HonoType) {
 	EducationsRoutes(app);
 	GamesRoutes(app);
 	StorageRoutes(app);
+	CvConfigRoutes(app);
 }

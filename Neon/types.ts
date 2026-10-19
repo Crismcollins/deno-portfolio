@@ -14,6 +14,7 @@ export type User = {
   email: string;
   linkedin_url: string;
   github_url: string;
+  portfolio_url: string;
   location: string;
   phone_number: string;
   about_me: string;
@@ -29,6 +30,7 @@ export type UserResponse = {
   alias: string;
   email: string;
   linkedin_url: string;
+  portfolio_url: string;
   about_me: string;
   image: string;
   study_title: string;

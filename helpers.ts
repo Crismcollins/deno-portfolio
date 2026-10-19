@@ -28,6 +28,7 @@ export const isValidUser = (obj: User): obj is User => {
     'alias' in obj &&
     'email' in obj &&
     'linkedin_url' in obj &&
+    'portfolio_url' in obj &&
     'image' in obj &&
     'about_me' in obj &&
     'study_title' in obj &&
@@ -37,6 +38,7 @@ export const isValidUser = (obj: User): obj is User => {
     typeof obj.alias === 'string' &&
     typeof obj.email === 'string' &&
     typeof obj.linkedin_url === 'string' &&
+    typeof obj.portfolio_url === 'string' &&
     typeof obj.image === 'string' &&
     typeof obj.about_me === 'string' &&
     typeof obj.study_title === 'string' &&

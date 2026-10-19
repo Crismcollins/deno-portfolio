@@ -13,6 +13,7 @@ export class User extends Model {
     email: DataTypes.STRING,
     linkedin_url: DataTypes.STRING,
     github_url: DataTypes.STRING,
+    portfolio_url: DataTypes.STRING,
     location: DataTypes.STRING,
     phone_number: DataTypes.STRING,
     image: DataTypes.STRING,

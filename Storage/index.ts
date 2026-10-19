@@ -1,4 +1,5 @@
 import { arrayBufferToBase64 } from "./helpers.ts";
+import type { Language } from "../Neon/types.ts";
 
 const IMAGEKIT_API_URL = Deno.env.get("IMAGEKIT_URL") ?? '';
 const PRIVATE_API_KEY = Deno.env.get("IMAGEKIT_KEY") ?? '';
@@ -51,6 +52,96 @@ export async function uploadToStorage(file: File) {
   }
 
   return { data: file, error: null, status: response.status }
+}
+
+export async function uploadCV(file: File, fileName: string) {
+  const finalUrl = `${baseUrl}/upload`;
+
+  const arrayBuffer = await file.arrayBuffer();
+  const base64 = arrayBufferToBase64(arrayBuffer);
+  const payload = new URLSearchParams();
+
+  payload.append("file", `data:${file.type};base64,${base64}`);
+  payload.append("fileName", fileName);
+  payload.append("folder", "/CVs");
+
+  const response = await fetch(finalUrl, {
+    method: "POST",
+    headers: {
+      Authorization: authHeader,
+      "Content-Type": "application/x-www-form-urlencoded",
+    },
+    body: payload.toString(),
+  });
+
+  if (!response.ok) {
+    return { data: null, error: response.statusText, status: response.status }
+  }
+
+  const result = await response.json();
+
+  return { data: result, error: null, status: response.status }
+}
+
+const extractFileNameFromUrl = (url: string): string => {
+  try {
+    const pathname = new URL(url).pathname;
+    const segments = pathname.split("/");
+    return segments[segments.length - 1] || "cv.pdf";
+  } catch {
+    return "cv.pdf";
+  }
+};
+
+export async function getLatestCV(language: Language = "en") {
+  const finalUrl = `${baseUrl}?path=/CVs/`;
+
+  const response = await fetch(finalUrl, {
+    method: "GET",
+    headers: {
+      Authorization: authHeader,
+      Accept: 'application/json',
+    },
+  });
+
+  if (!response.ok) {
+    return { data: null, error: response.statusText, status: response.status };
+  }
+
+  const files = await response.json();
+
+  const fileList = Array.isArray(files) ? files : (files.list ?? []);
+
+  const langTag = language.toUpperCase();
+
+  const filtered = fileList.filter((file: any) => {
+    const name = file.name ?? "";
+    return name.includes(`_${langTag}_`);
+  });
+
+  if (filtered.length === 0) {
+    return { data: null, error: `No hay CVs disponibles para el idioma '${language}'`, status: 404 };
+  }
+
+  const sorted = filtered.sort((a: any, b: any) => {
+    const dateA = new Date(a.createdAt ?? a.fileModifiedDate ?? 0).getTime();
+    const dateB = new Date(b.createdAt ?? b.fileModifiedDate ?? 0).getTime();
+    return dateB - dateA;
+  });
+
+  const latest = sorted[0];
+  const fileName = latest.name ?? extractFileNameFromUrl(latest.url);
+
+  return {
+    data: {
+      url: latest.url,
+      fileId: latest.fileId,
+      name: fileName,
+      filePath: latest.filePath,
+    },
+    error: null,
+    status: 200,
+  };
 }
 
 export async function removeFile(id: string) {
