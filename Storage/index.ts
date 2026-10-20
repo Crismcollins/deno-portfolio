@@ -7,6 +7,15 @@ const PRIVATE_API_KEY = Deno.env.get("IMAGEKIT_KEY") ?? '';
 const authHeader = "Basic " + btoa(`${PRIVATE_API_KEY}:`);
 const baseUrl = `${IMAGEKIT_API_URL}`;
 
+type ImageKitFile = {
+  name?: string;
+  createdAt?: string;
+  fileModifiedDate?: string;
+  url?: string;
+  fileId?: string;
+  filePath?: string;
+};
+
 export async function fetchStorage() {    
   const finalUrl = `${baseUrl}?path=/Storage/`;
   
@@ -114,7 +123,7 @@ export async function getLatestCV(language: Language = "en") {
 
   const langTag = language.toUpperCase();
 
-  const filtered = fileList.filter((file: any) => {
+  const filtered = fileList.filter((file: ImageKitFile) => {
     const name = file.name ?? "";
     return name.includes(`_${langTag}_`);
   });
@@ -123,7 +132,7 @@ export async function getLatestCV(language: Language = "en") {
     return { data: null, error: `No hay CVs disponibles para el idioma '${language}'`, status: 404 };
   }
 
-  const sorted = filtered.sort((a: any, b: any) => {
+  const sorted = filtered.sort((a: ImageKitFile, b: ImageKitFile) => {
     const dateA = new Date(a.createdAt ?? a.fileModifiedDate ?? 0).getTime();
     const dateB = new Date(b.createdAt ?? b.fileModifiedDate ?? 0).getTime();
     return dateB - dateA;

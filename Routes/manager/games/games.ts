@@ -15,13 +15,13 @@ export const GamesRoutes = (app: HonoType) => {
     if (error) return c.json({ message: error.message }, 400);
     if (!data) return c.json({ message: 'Game not found' }, 204);
 
-    const game: Game = data[0];
+    const game: Game = data[0] as Game;
     
     const { data: gamesSkills, error:gamesSkillsError, message, status } = await getItem('games_skills', game.id, 'game_id');
     
     if (gamesSkillsError) return c.json({ message }, status);
 
-    const games_skills: GamesSkills[] = gamesSkills;
+    const games_skills: GamesSkills[] = gamesSkills as GamesSkills[];
 
     const skillsId: number[] = games_skills.map(skill => skill.skill_id);
 
@@ -31,7 +31,7 @@ export const GamesRoutes = (app: HonoType) => {
 
     const gameResponse: GameResponse = {
       ...game,
-      skills,
+      skills: skills as Skill[],
       date_release: new Date(game.date_release).toISOString().slice(0, 10)
     }
 
@@ -52,11 +52,14 @@ export const GamesRoutes = (app: HonoType) => {
     const game: Game = {...rest, video: youtubeUrlEmbed ?? rest.video }
 
     const { error: errorAddGame, status, data } = await addItemToTable('games', game);
-    
-    if (!skills || skills.length <= 0)
-      return c.json({ errorAddGame, message: 'An error occurried while added a skill' }, status);
 
-    const gameId:number = data[0].id;
+    if (errorAddGame || !data || data.length === 0)
+      return c.json({ error: errorAddGame, message: 'An error occurred while adding a game' }, status);
+
+    if (!skills || skills.length <= 0)
+      return c.json({ error: errorAddGame, message: 'An error occurred while adding a skill' }, status);
+
+    const gameId:number = (data[0] as { id: number }).id;
     const gameSkills: Skill[] = skills;
     
     const { error, status: statusGame} = await addRelation('games_skills', gameSkills, gameId );

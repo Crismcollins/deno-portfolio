@@ -36,5 +36,5 @@ export const redirectUrl: MiddlewareHandler = async (c: Context, next: Next) => 
   }
 
   // Continúa con el siguiente middleware o handler
-  return next();
+  await next();
 };

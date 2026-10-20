@@ -1,22 +1,25 @@
 import { StatusCode } from "../../deps.ts";
 import sql, { Language, Tables } from "../index.ts";
 
-export const getTable = async (table: Tables, language?: Language) => {
+export const getTable = async <T = Record<string, unknown>>(
+  table: Tables,
+  language?: Language
+) => {
   try {
     const query = language ? await sql`
     SELECT * FROM ${sql.unsafe(table)}
     WHERE language = ${language}
   ` : await sql`SELECT * FROM ${sql.unsafe(table)}`;
-    
+
     return {
-      data: query,
+      data: query as T[],
       status: 200 as StatusCode,
       message: 'OK',
       error: null,
     };
   } catch (error) {
     return {
-      data: [],
+      data: [] as T[],
       status: 500,
       message: 'Error',
       error: error.message,
@@ -24,7 +27,11 @@ export const getTable = async (table: Tables, language?: Language) => {
   }
 };
 
-export const getItem = async (table: Tables, id: number, customLabelId: string = 'id') => {
+export const getItem = async <T = Record<string, unknown>>(
+  table: Tables,
+  id: number,
+  customLabelId: string = 'id'
+) => {
   try {
     const data = await sql`
       SELECT * FROM ${sql.unsafe(table)}
@@ -32,14 +39,14 @@ export const getItem = async (table: Tables, id: number, customLabelId: string =
     `;
 
     return {
-      data,
+      data: data as T[],
       status: 200 as StatusCode,
       message: 'OK',
       error: null,
     };
   } catch (error) {
     return {
-      data: [],
+      data: [] as T[],
       status: 500 as StatusCode,
       message: 'Error',
       error: error.message,
@@ -47,7 +54,7 @@ export const getItem = async (table: Tables, id: number, customLabelId: string =
   }
 };
 
-export const getItems = async (
+export const getItems = async <T = Record<string, unknown>>(
   table: Tables,
   ids: number[],
   customLabelId: string = 'id'
@@ -59,14 +66,14 @@ export const getItems = async (
     `;
 
     return {
-      data,
+      data: data as T[],
       skillsStatus: 200 as StatusCode,
       skillsMessage: 'OK',
       error: null,
     };
   } catch (error) {
     return {
-      data: [],
+      data: [] as T[],
       skillsStatus: 500 as StatusCode,
       skillsMessage: 'Error',
       error: error.message,

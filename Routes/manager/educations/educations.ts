@@ -21,7 +21,7 @@ export const EducationsRoutes = (app:HonoType) => {
 
 		if (!data) return c.json({ data: {} }, 200);
 
-		const educationResponse: EducationResponse = data[0];
+		const educationResponse: EducationResponse = data[0] as EducationResponse;
 
 		return c.json({ data: educationResponse }, 200);
 	});

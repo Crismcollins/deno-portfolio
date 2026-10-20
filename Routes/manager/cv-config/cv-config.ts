@@ -1,5 +1,10 @@
 import { HonoType, StatusCode } from "../../../deps.ts";
-import sql from "../../../Neon/index.ts";
+import { translateContent } from "../../../llm/http.ts";
+import { FeatureLLM } from "../../../llm/nvidia_payload.ts";
+import { detectLanguage } from "../../../llm/translate/languages.ts";
+import { CV_CONTENT_SCHEMA } from "../../../llm/translate/schemas.ts";
+import { TranslateCVContentRequest, CVContentContract } from "../../../llm/translate/types.ts";
+import sql, { Language } from "../../../Neon/index.ts";
 import { uploadCV } from "../../../Storage/index.ts";
 
 const VALID_SECTION_IDS = ["experience", "education", "projects"];
@@ -191,7 +196,8 @@ export const CvConfigRoutes = (app: HonoType) => {
   app.post("/manager/cv/pdf", async (c) => {
     const formData = await c.req.formData();
     const file = formData.get("file") as File | null;
-    const filename = formData.get("filename") as string | null;
+    const contentStr = formData.get("content") as string | null;
+    const languageTarget = formData.get("languageTarget") as string | null;
 
     if (!file) {
       return c.json(
@@ -200,39 +206,220 @@ export const CvConfigRoutes = (app: HonoType) => {
       );
     }
 
-    if (!filename) {
+    if (!contentStr) {
       return c.json(
-        { data: null, message: "Campo 'filename' es requerido", status: 400, error: "" },
+        { data: null, message: "Campo 'content' es requerido", status: 400, error: "" },
         400
       );
     }
 
-    const { data, error, status } = await uploadCV(file, filename);
-
-    if (error) {
+    if (!languageTarget) {
       return c.json(
-        {
-          data: null,
-          message: "Error al subir el CV a ImageKit",
-          status,
-          error,
-        },
-        status
+        { data: null, message: "Campo 'languageTarget' es requerido", status: 400, error: "" },
+        400
       );
     }
 
-    return c.json(
-      {
-        data: {
-          url: (data as { url?: string })?.url ?? null,
-          fileId: (data as { fileId?: string })?.fileId ?? null,
-          name: (data as { name?: string })?.name ?? null,
+    let content: CVContentContract;
+    try {
+      content = JSON.parse(contentStr) as CVContentContract;
+    } catch {
+      return c.json(
+        { data: null, message: "Campo 'content' debe ser un JSON válido", status: 400, error: "" },
+        400
+      );
+    }
+
+    const languageSource = detectLanguage(
+      content.description,
+    ) as Language;
+
+    const targetLanguage = languageTarget as Language;
+
+    /* ------------------------------------------------------------------ */
+    /*  Obtener nombre del usuario para generar el nombre del archivo     */
+    /* ------------------------------------------------------------------ */
+    const userRows = await sql`
+      SELECT full_name
+      FROM users
+      WHERE id = ${TEMP_USER_ID}
+    `;
+
+    const user = (userRows as Array<{ full_name: string }>)[0];
+    const userName = user?.full_name ?? "usuario";
+
+    /* Remover acentos/diacríticos antes de limpiar el nombre */
+    const removeAccents = (text: string): string =>
+      text.normalize("NFD").replace(/[\u0300-\u036f]/g, "");
+
+    const safeUserName = removeAccents(userName)
+      .toLowerCase()
+      .replace(/\s+/g, "_")
+      .replace(/[^a-z0-9_]/g, "");
+
+    const languageSuffix =
+      targetLanguage === "en" ? "ENG" : targetLanguage === "es" ? "ESP" : (targetLanguage as string).toUpperCase();
+
+    const filename = `${safeUserName}_CV_${languageSuffix}.pdf`;
+
+    /* ------------------------------------------------------------------ */
+    /*  Idioma igual: guardar PDF directo en ImageKit                     */
+    /* ------------------------------------------------------------------ */
+    if (languageSource === targetLanguage) {
+      const { data, error, status } = await uploadCV(file, filename);
+
+      if (error) {
+        return c.json(
+          {
+            data: null,
+            message: "Error al subir el CV a ImageKit",
+            status,
+            error,
+          },
+          status as StatusCode
+        );
+      }
+
+      return c.json(
+        {
+          action: "download",
+          data: {
+            url: (data as { url?: string })?.url ?? null,
+            fileId: (data as { fileId?: string })?.fileId ?? null,
+            name: (data as { name?: string })?.name ?? null,
+          },
+          message: "CV subido correctamente",
+          status: 200,
+          error: "",
         },
-        message: "CV subido correctamente",
-        status: 200,
-        error: "",
-      },
-      200
-    );
+        200
+      );
+    }
+
+    /* ------------------------------------------------------------------ */
+    /*  Idioma distinto: traducir el contenido y devolverlo al front      */
+    /* ------------------------------------------------------------------ */
+    try {
+      const response = await translateContent(
+        FeatureLLM.translate,
+        { content, languageTarget: targetLanguage },
+        languageSource,
+      );
+
+      if (!response.ok) {
+        const errorText = await response.text();
+        console.error("Error de NVIDIA:", response.status, errorText);
+
+        return c.json(
+          { success: false, error: "Error al traducir el contenido" },
+          502,
+        );
+      }
+
+      const result = await response.json();
+      const translatedContentRaw = result.choices[0]?.message?.content;
+
+      if (typeof translatedContentRaw !== "string" || !translatedContentRaw.trim()) {
+        return c.json(
+          { success: false, error: "NVIDIA devolvió una respuesta vacía" },
+          502,
+        );
+      }
+
+      const translatedContent = CV_CONTENT_SCHEMA.parse(
+        JSON.parse(translatedContentRaw),
+      );
+
+      return c.json(
+        {
+          action: "translate",
+          data: translatedContent,
+          message: "Contenido traducido. Renderice el PDF y súbalo nuevamente.",
+          status: 200,
+          error: "",
+        },
+        200
+      );
+    } catch (error) {
+      console.error("Error de traducción:", error);
+
+      return c.json(
+        { success: false, error: "NVIDIA devolvió JSON inválido" },
+        502,
+      );
+    }
+  });
+
+  app.post("/manager/cv/translate", async (c) => {
+    let content: string | undefined;
+
+    try {
+      const body: TranslateCVContentRequest = await c.req.json();
+
+      const languageSource = detectLanguage(
+        body.content.description,
+      ) as Language;
+
+      const response = await translateContent(
+        FeatureLLM.translate,
+        body,
+        languageSource,
+      );
+
+      if (!response.ok) {
+        const error = await response.text();
+        console.error("Error de NVIDIA:", response.status, error);
+
+        return c.json(
+          { success: false, error: "Error al traducir el contenido" },
+          502,
+        );
+      }
+
+      const result = await response.json();
+      content = result.choices[0]?.message?.content;
+
+      if (typeof content !== "string" || !content.trim()) {
+        console.error("Respuesta vacía de NVIDIA:", result);
+
+        return c.json(
+          { success: false, error: "NVIDIA devolvió una respuesta vacía" },
+          502,
+        );
+      }
+
+      try {
+        const translatedContent = CV_CONTENT_SCHEMA.parse(
+          JSON.parse(content),
+        );
+
+        return c.json({
+          success: true,
+          data: translatedContent,
+        });
+      } catch (error) {
+        console.error("Respuesta inválida de NVIDIA:", error);
+        console.error("Contenido recibido:", content);
+
+        return c.json(
+          { success: false, error: "La respuesta no cumple el schema esperado" },
+          502,
+        );
+      }
+    } catch (error) {
+      console.error("Error:", error);
+
+      if (content) {
+        const match = String(error).match(/position (\d+)/);
+        const position = match ? Number(match[1]) : 0;
+        console.error("Fragmento:", content.slice(position - 150, position + 150));
+        console.error("Carácter:", JSON.stringify(content[position]));
+      }
+
+      return c.json(
+        { success: false, error: "NVIDIA devolvió JSON inválido" },
+        502,
+      );
+    }
   });
 };

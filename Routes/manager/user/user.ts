@@ -3,7 +3,7 @@ import { Language } from "../../../Neon/index.ts";
 import { updateUser } from "../../../Neon/requests/update.ts";
 import { isValidUser } from "../../../helpers.ts";
 import { UserResponse } from "../../../Neon/types.ts";
-import { HonoType } from "../../../deps.ts";
+import { HonoType, StatusCode } from "../../../deps.ts";
 
 export const UserRoutes = (app: HonoType) => {
 
@@ -41,7 +41,7 @@ export const UserRoutes = (app: HonoType) => {
     
     const { error: errorUser, status, data } = await updateUser(body);
     
-    if (errorUser) return c.json({ errorUser }, status);
+    if (errorUser) return c.json({ errorUser }, status as StatusCode);
 
     return c.json({ data, message: 'User updated successfully!!' }, 200);
 

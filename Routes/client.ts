@@ -1,6 +1,6 @@
-import { EducationResponse, GameResponse, Job, JobResponse, Language, Skill, UserResponse, JobsSkills, JobsGames } from "../Neon/types.ts";
+import { EducationResponse, Game, GameResponse, Job, JobResponse, Language, Skill, UserResponse, JobsSkills, JobsGames } from "../Neon/types.ts";
 import { getItem, getItems, getTable } from "../Neon/requests/get.ts";
-import { HonoType } from "../deps.ts";
+import { HonoType, StatusCode } from "../deps.ts";
 import { convertTimeStampToYYMM, sortJobs } from "../helpers.ts";
 import { Education } from "../Neon/types.ts";
 import { getLatestCV } from "../Storage/index.ts";
@@ -9,7 +9,7 @@ export function ClientRoutes(app: HonoType) {
 
   app.get("/client/user/:language?", async (c) => {
     const language = c.req.param('language') as Language || 'en';
-    const users = await getTable('users', language);
+    const users = await getTable<UserResponse>('users', language);
 
     if (!users.data) return c.json({ message: "User doesn't exist" }, 404);
 
@@ -20,7 +20,7 @@ export function ClientRoutes(app: HonoType) {
 
   app.get("/client/skills/:language?", async (c) => {
     const language = c.req.param('language') as Language || 'en';
-    const data = await getTable('skills');
+    const data = await getTable<Skill>('skills');
 
     if (!data.data) return c.json({ message: data }, 500);
 
@@ -33,14 +33,14 @@ export function ClientRoutes(app: HonoType) {
   });
 
   app.get("/client/jobs", async (c) => {
-    const data = await getTable('jobs');
+    const data = await getTable<Job>('jobs');
     return c.json(data);
   });
 
   app.get("/client/jobs/:language?", async (c) => {
     const language = c.req.param('language') as Language || 'en';
 
-    const data = await getTable('jobs', language);
+    const data = await getTable<Job>('jobs', language);
 
     if (!data.data) return c.json({ data: [] }, 200);
 
@@ -50,7 +50,7 @@ export function ClientRoutes(app: HonoType) {
 
     const jobs: JobResponse[] = await Promise.all(
       jobsSorted.map(async (jobResponse) => {
-        const { data, error } = await getItem('jobs_skills', jobResponse.id, 'job_id');
+        const { data, error } = await getItem<JobsSkills>('jobs_skills', jobResponse.id, 'job_id');
 
         if (error) throw new Error(error);
 
@@ -58,11 +58,11 @@ export function ClientRoutes(app: HonoType) {
 
         const jobsSkillsIds: number[] = jobsSkills.map(jobSkill => jobSkill.skill_id);
 
-        const { data: skills, error: skillsError } = await getItems('skills', jobsSkillsIds);
+        const { data: skills, error: skillsError } = await getItems<Skill>('skills', jobsSkillsIds);
 
         if (skillsError) throw new Error(skillsError);
 
-        const { data: jobGamesData, error: jobsGamesError } = await getItem('jobs_games', jobResponse.id, 'job_id');
+        const { data: jobGamesData, error: jobsGamesError } = await getItem<JobsGames>('jobs_games', jobResponse.id, 'job_id');
 
         if (jobsGamesError) throw new Error(jobsGamesError);
 
@@ -70,7 +70,7 @@ export function ClientRoutes(app: HonoType) {
 
         const jobsGamesIds: number[] = jobsGames.map(jobGames => jobGames.game_id);
 
-        const { data: games, error: gamesError } = await getItems('games', jobsGamesIds)
+        const { data: games, error: gamesError } = await getItems<Game>('games', jobsGamesIds)
 
         if (gamesError) throw new Error(gamesError);
 
@@ -89,7 +89,7 @@ export function ClientRoutes(app: HonoType) {
 
   app.get("/client/educations/:language?", async (c) => {
     const language = c.req.param('language') as Language || 'en';
-    const data = await getTable('educations', language);
+    const data = await getTable<Education>('educations', language);
 
     if (!data.data) return c.json({ data: [] }, 200);
 
@@ -105,7 +105,7 @@ export function ClientRoutes(app: HonoType) {
 
     if (!language) return c.json({ message: 'language was not provided' }, 400);
 
-    const { data, error } = await getTable('games', language);
+    const { data, error } = await getTable<GameResponse>('games', language);
 
     if (error) return c.json({ message: error.message }, 400);
     if (!data) return c.json({ message: 'No games' }, 204);
@@ -131,7 +131,7 @@ export function ClientRoutes(app: HonoType) {
     if (error) {
       return c.json(
         { data: null, message: "No se pudo obtener el CV", status, error },
-        status
+        status as StatusCode
       );
     }
 
@@ -151,7 +151,7 @@ export function ClientRoutes(app: HonoType) {
       if (!response.ok) {
         return c.json(
           { data: null, message: "No se pudo descargar el PDF de ImageKit", status: response.status, error: "" },
-          response.status
+          response.status as StatusCode
         );
       }
 

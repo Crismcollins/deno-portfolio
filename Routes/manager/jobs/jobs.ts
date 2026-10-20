@@ -3,7 +3,7 @@ import { addItemToTable, addRelation } from "../../../Neon/requests/add.ts";
 import { updateRelationTable, updateTable } from "../../../Neon/requests/update.ts";
 import { deleteItem } from "../../../Neon/requests/delete.ts";
 import { getItem, getItems } from "../../../Neon/requests/get.ts";
-import { Job, JobResponse, JobsGames, JobsSkills } from "../../../Neon/types.ts";
+import { Game, Job, JobResponse, JobsGames, JobsSkills, Skill } from "../../../Neon/types.ts";
 import { HonoType } from "../../../deps.ts";
 
 export const JobsRoutes = (app: HonoType) => {
@@ -18,13 +18,13 @@ export const JobsRoutes = (app: HonoType) => {
     if (!data)
       return c.json([]);
     
-    const jobResponse: Job = data[0];
+    const jobResponse: Job = data[0] as Job;
 
     const { data: jobsSkillsData, error: jobsSkillsError, message, status } = await getItem("jobs_skills", +id, 'job_id');
 
     if (jobsSkillsError) return c.json({ message }, status);
 
-    const jobSkills: JobsSkills[] = jobsSkillsData;
+    const jobSkills: JobsSkills[] = jobsSkillsData as JobsSkills[];
     const jobSkillsIds: number[] = jobSkills.map(jobSkill => jobSkill.skill_id);
     
     const { data: skills, error: skillsError, skillsMessage: skillsMessage, skillsStatus: skillsStatus} = await getItems('skills',jobSkillsIds);
@@ -35,14 +35,14 @@ export const JobsRoutes = (app: HonoType) => {
 
     if (jobGamesError) return c.json({ message: jobGamesMessage}, jobGamesStatus);
 
-    const gamesOfJob: JobsGames[] = jobGames;
+    const gamesOfJob: JobsGames[] = jobGames as JobsGames[];
     const jobGamesIds: number[] = gamesOfJob.map( gameJob => gameJob.game_id);
 
     const { data: games, error: errorGames, skillsMessage: messageGames, skillsStatus: statusGames } = await getItems('games', jobGamesIds);
 
     if (errorGames) return c.json({ message: messageGames },statusGames);
 
-    const job: JobResponse = {...jobResponse, skills, games }
+    const job: JobResponse = {...jobResponse, skills: skills as Skill[], games: games as Game[] }
     
     return c.json({ data:job }, 200);
       
@@ -59,9 +59,9 @@ export const JobsRoutes = (app: HonoType) => {
 
     const { data, error, status } = await addItemToTable('jobs', rest);
     
-    if (error) return c.json({ message: error }, status);
+    if (error || !data || data.length === 0) return c.json({ message: error }, status);
 
-    const job: Job = data[0];
+    const job: Job = data[0] as Job;
 
     if (games) {
       const { error: jobsGamesError, status: jobsGamesStatus } = await addRelation('jobs_games',games, job.id ?? 0);

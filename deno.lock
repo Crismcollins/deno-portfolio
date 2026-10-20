@@ -5,7 +5,8 @@
       "jsr:@neon/serverless@^1.0.0": "jsr:@neon/serverless@1.0.1",
       "npm:@types/node@^22.15.30": "npm:@types/node@22.20.1",
       "npm:@types/pg@^8.8.0": "npm:@types/pg@8.20.0",
-      "npm:events@^3.3.0": "npm:events@3.3.0"
+      "npm:events@^3.3.0": "npm:events@3.3.0",
+      "npm:zod": "npm:zod@4.6.7"
     },
     "jsr": {
       "@neon/serverless@1.0.1": {
@@ -83,8 +84,19 @@
       "xtend@4.0.2": {
         "integrity": "sha512-LKYU1iAXJXUgAXn9URjiu+MWhyUXHsvfp7mcuYm9dSUKK0/CjtrUwFAxD82/mCWbtLsGjFIad0wIsod4zrTAEQ==",
         "dependencies": {}
+      },
+      "zod@4.6.7": {
+        "integrity": "sha512-g8W2D2kU6a8untc053fX1uVBKzM7yqAxW/3zwk83+6RyF2+SKOuV+c0wBDhUwzV1PaGapmZH+rmcUzPf+3CGwg==",
+        "dependencies": {}
       }
     }
+  },
+  "redirects": {
+    "https://esm.sh/collapse-white-space@^2.0.0?target=denonext": "https://esm.sh/collapse-white-space@2.1.0?target=denonext",
+    "https://esm.sh/franc-all@7": "https://esm.sh/franc-all@7.2.0",
+    "https://esm.sh/franc@6": "https://esm.sh/franc@6.2.0",
+    "https://esm.sh/n-gram@^2.0.0?target=denonext": "https://esm.sh/n-gram@2.0.2?target=denonext",
+    "https://esm.sh/trigram-utils@^2.0.0?target=denonext": "https://esm.sh/trigram-utils@2.0.1?target=denonext"
   },
   "remote": {
     "https://cdn.skypack.dev/-/bson@v4.5.4-F38JF4sWndM08oQ5WCDI/dist=es2020,mode=imports/optimized/bson.js": "47f919700b7c3b4a5b3a7843be762ae9406e7cd485311916f198ff5a2da0c751",
@@ -581,6 +593,16 @@
     "https://dev.jspm.io/npm:tarn@3.0.2!cjs": "10d36fa02c417be23d95aef8a2c56560fda5218d9c634841cb9c4defa8d8caa9",
     "https://dev.jspm.io/pg-connection-string@2.5.0": "88db7c98838dc09ebfb18d8b76819a964b2058dae3555c8abc8ef8205379a66e",
     "https://dev.jspm.io/tarn@3": "a18823e1188f20b398a345fc0807f34a12b0b80fcfe58f9e3497ba30d7f8109c",
+    "https://esm.sh/collapse-white-space@2.1.0/denonext/collapse-white-space.mjs": "894fb43a3cc72a5f66a826eff43cd1783c33b48a8a42e77c1b42cfb7d27f0f19",
+    "https://esm.sh/collapse-white-space@2.1.0?target=denonext": "2b5fd6f943dc13a5c07082f25ab6be66749b046a2ecfe6da5fd4f6d70108d37a",
+    "https://esm.sh/franc-all@7.2.0": "eade448fdd9ca546c790d436c0e680814850f0dae087e8a408d00bfe7e4cbc44",
+    "https://esm.sh/franc-all@7.2.0/denonext/franc-all.mjs": "cadeba204ffda2921872999f3da34ebeb6fc6be438506ec82c096e75cb20d6e0",
+    "https://esm.sh/franc@6.2.0": "2a0603206ede08c2cbe31d50666a249ba5794d6f21eeaa788999c80052f8cd74",
+    "https://esm.sh/franc@6.2.0/denonext/franc.mjs": "15f34d665bc095b8da7e3d4075b2698a5b94a3bca1850336421f13b265d3bdba",
+    "https://esm.sh/n-gram@2.0.2/denonext/n-gram.mjs": "456e9a047645dc8c97cb91a73c07edfb8f9d5c5007abe03fabfce222f2d806ce",
+    "https://esm.sh/n-gram@2.0.2?target=denonext": "79f8b1c641421b93f18cff0d150fb52720a38905d1504398dcb096ba6f57ecb7",
+    "https://esm.sh/trigram-utils@2.0.1/denonext/trigram-utils.mjs": "c418e13ec0272b1c9dd617d8bc46c88a6164e32bc30caa7a80659aa837c5c53b",
+    "https://esm.sh/trigram-utils@2.0.1?target=denonext": "9e598e45a40f693c5b73fb2485c146a5caf0dcffea6c6bc360100c9d379e8e6f",
     "https://raw.githubusercontent.com/Zhomart/dex/930253915093e1e08d48ec0409b4aee800d8bd0c/lib-dyn/client.js": "aa9b066c97b22baca161d41f6ed4dcf0ac1c94a49f3ab502e1e154c6338f8419",
     "https://raw.githubusercontent.com/Zhomart/dex/930253915093e1e08d48ec0409b4aee800d8bd0c/lib-dyn/constants.js": "bd92962186cc91e68ef757b8c555c43e123d4bed882ef1479cb011b205e05c22",
     "https://raw.githubusercontent.com/Zhomart/dex/930253915093e1e08d48ec0409b4aee800d8bd0c/lib-dyn/deps.ts": "6a0d7af44dd1168f3db5caf572c7e6aedbc145003105c436985045a850ad73e6",

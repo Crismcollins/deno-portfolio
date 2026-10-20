@@ -8,9 +8,7 @@ export const generateSqlInsert = (params: Record<string, unknown>) => {
 
   if (keys.length === 0) throw new Error('No params provided');
 
-  const columnsSql = keys
-    .map((k) => sql.unsafe(k))
-    .reduce((acc, curr, i) => (i === 0 ? curr : sql`${acc}, ${curr}`));
+  const columnsSql = sql.unsafe(keys.join(', '));
 
   const valuesSql = values
     .map((v) => sql`${v}`)

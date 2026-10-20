@@ -42,7 +42,7 @@ y eficaz. Facilitando a profesores la enseñanza de negocio.',
             • Migración de tecnología a juego SodaPopGame', 
             'Santiago, Chile', 
             'Felipe Walker, CEO de Gamelab Education - +56985270398', 
-            '{"id":"e21a8649-c95c-48d6-b423-b90b8d27ca42","name":"gamelab_chile_logo.jpeg","url":"https://jdhdxwikqtgoypffioag.supabase.co/storage/v1/object/public/portfolio-storage/images/gamelab_chile_logo.jpeg","type":"image"}'
+            '{"id":"e21a8649-c95c-48d6-b423-b90b8d27ca42","name":"gamelab_chile_logo.jpeg","url":"gamelab_chile_logo.jpeg","type":"image"}'
         );
     END IF;
 
@@ -93,7 +93,7 @@ para la contratación de consultas de salud de manera amigable y cercana.',
             • Liderazgo de equipos de desarrollo. ',
             'Santiago, Chile', 
             'Mario Lavandero, ex CTO de Meydey - +56997765669', 
-            '{"id":"82d3b714-445e-4f55-8fd5-6fcdf962bea8","name":"meydey_logo.jpeg","url":"https://jdhdxwikqtgoypffioag.supabase.co/storage/v1/object/public/portfolio-storage/images/meydey_logo.jpeg","type":"image"}'
+            '{"id":"82d3b714-445e-4f55-8fd5-6fcdf962bea8","name":"meydey_logo.jpeg","url":"meydey_logo.jpeg","type":"image"}'
         );
     END IF;
 
@@ -118,7 +118,7 @@ para la contratación de consultas de salud de manera amigable y cercana.',
             • Technology migration to SodaPopGame', 
             'Santiago, Chile', 
             'Felipe Walker, CEO of Gamelab Education - +56985270398', 
-            '{"id":"e21a8649-c95c-48d6-b423-b90b8d27ca42","name":"gamelab_chile_logo.jpeg","url":"https://jdhdxwikqtgoypffioag.supabase.co/storage/v1/object/public/portfolio-storage/images/gamelab_chile_logo.jpeg","type":"image"}'
+            '{"id":"e21a8649-c95c-48d6-b423-b90b8d27ca42","name":"gamelab_chile_logo.jpeg","url":"gamelab_chile_logo.jpeg","type":"image"}'
         );
     END IF;
 
@@ -168,7 +168,7 @@ para la contratación de consultas de salud de manera amigable y cercana.',
             • Leadership of development teams ',
             'Santiago, Chile', 
             'Mario Lavandero, ex CTO of Meydey - +56997765669', 
-            '{"id":"82d3b714-445e-4f55-8fd5-6fcdf962bea8","name":"meydey_logo.jpeg","url":"https://jdhdxwikqtgoypffioag.supabase.co/storage/v1/object/public/portfolio-storage/images/meydey_logo.jpeg","type":"image"}'
+            '{"id":"82d3b714-445e-4f55-8fd5-6fcdf962bea8","name":"meydey_logo.jpeg","url":"meydey_logo.jpeg","type":"image"}'
         );
     END IF;
 END;

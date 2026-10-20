@@ -109,14 +109,14 @@ export const updateUser = async (user: User) => {
 
     const updates = Object.entries(rest).map(
       ([key, value]) => `${key} = '${value}'`
-    )
+    ).join(', ');
 
-    const data: User = await sql`
+    const data = await sql`
       UPDATE users
       SET ${sql.unsafe(updates)}
       WHERE id = ${id}
       RETURNING *;
-    `;
+    ` as unknown as { id: number }[];
     
     return {
       data: data,
