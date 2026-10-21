@@ -17,7 +17,6 @@ export interface CVContentContract {
   studyTitle?: string;
   workItems: WorkItem[];
   EducationItems: SectionItem[];
-  ProjectItems: ProjectItem[];
 }
 
 export interface SectionItem {
@@ -30,5 +29,3 @@ export interface WorkItem extends SectionItem {
   companyDescription: string;
   achievements?: string;
 }
-
-export interface ProjectItem extends Omit<SectionItem, 'date'> { }

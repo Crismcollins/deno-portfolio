@@ -5,7 +5,7 @@ import { detectLanguage } from "../../../llm/translate/languages.ts";
 import { CV_CONTENT_SCHEMA } from "../../../llm/translate/schemas.ts";
 import { TranslateCVContentRequest, CVContentContract } from "../../../llm/translate/types.ts";
 import sql, { Language } from "../../../Neon/index.ts";
-import { uploadCV } from "../../../Storage/index.ts";
+import { uploadCV, enforceCvLimit } from "../../../Storage/index.ts";
 
 const VALID_SECTION_IDS = ["experience", "education", "projects"];
 
@@ -206,6 +206,19 @@ export const CvConfigRoutes = (app: HonoType) => {
       );
     }
 
+    const MAX_FILE_SIZE = 20 * 1024 * 1024; // 20 MB
+    if (file.size > MAX_FILE_SIZE) {
+      return c.json(
+        {
+          data: null,
+          message: `El archivo excede el límite de 20 MB. Tamaño actual: ${(file.size / 1024 / 1024).toFixed(2)} MB`,
+          status: 400,
+          error: "File too large",
+        },
+        400
+      );
+    }
+
     if (!contentStr) {
       return c.json(
         { data: null, message: "Campo 'content' es requerido", status: 400, error: "" },
@@ -258,9 +271,19 @@ export const CvConfigRoutes = (app: HonoType) => {
       .replace(/[^a-z0-9_]/g, "");
 
     const languageSuffix =
-      targetLanguage === "en" ? "ENG" : targetLanguage === "es" ? "ESP" : (targetLanguage as string).toUpperCase();
+      targetLanguage === "en" ? "EN" : targetLanguage === "es" ? "ES" : (targetLanguage as string).toUpperCase();
 
     const filename = `${safeUserName}_CV_${languageSuffix}.pdf`;
+
+    /* ------------------------------------------------------------------ */
+    /*  Límite de versiones: eliminar el más antiguo si supera 5 CVs      */
+    /* ------------------------------------------------------------------ */
+    const limitResult = await enforceCvLimit(safeUserName, targetLanguage, 5);
+    if (limitResult.error) {
+      console.error("Error al aplicar límite de CVs:", limitResult.error);
+    } else if (limitResult.deleted && limitResult.deleted > 0) {
+      console.error(`Se eliminaron ${limitResult.deleted} CV antiguo(s) por límite de 5 versiones`);
+    }
 
     /* ------------------------------------------------------------------ */
     /*  Idioma igual: guardar PDF directo en ImageKit                     */

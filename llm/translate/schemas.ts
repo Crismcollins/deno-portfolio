@@ -20,13 +20,6 @@ export const CV_CONTENT_SCHEMA = z.object({
       description: z.string(),
     }).strict(),
   ),
-
-  ProjectItems: z.array(
-    z.object({
-      title: z.string(),
-      description: z.string(),
-    }).strict(),
-  ),
 }).strict();
 
 export type CVContent = z.infer<typeof CV_CONTENT_SCHEMA>;
@@ -70,19 +63,7 @@ export const CV_CONTENT_JSON_SCHEMA = {
         additionalProperties: false,
       },
     },
-    ProjectItems: {
-      type: "array",
-      items: {
-        type: "object",
-        properties: {
-          title: { type: "string" },
-          description: { type: "string" },
-        },
-        required: ["title", "description"],
-        additionalProperties: false,
-      },
-    },
   },
-  required: ["description", "workItems", "EducationItems", "ProjectItems"],
+  required: ["description", "workItems", "EducationItems"],
   additionalProperties: false,
 };

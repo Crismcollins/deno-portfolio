@@ -23,12 +23,6 @@ The JSON object must have exactly this structure:
       "date": "<translated date>",
       "description": "<translated description>"
     }
-  ],
-  "ProjectItems": [
-    {
-      "title": "<translated title>",
-      "description": "<translated description>"
-    }
   ]
 }
 
